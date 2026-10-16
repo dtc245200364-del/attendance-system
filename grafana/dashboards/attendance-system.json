@@ -1,0 +1,398 @@
+{
+    "schemaVersion":  39,
+    "time":  {
+                 "to":  "now",
+                 "from":  "now-15m"
+             },
+    "templating":  {
+                       "list":  [
+
+                                ]
+                   },
+    "annotations":  {
+                        "list":  [
+
+                                 ]
+                    },
+    "version":  1,
+    "panels":  [
+                   {
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "min":  0,
+                                                            "unit":  "percent"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "id":  1,
+                       "gridPos":  {
+                                       "y":  0,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  0
+                                   },
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "attendance-prometheus"
+                                      },
+                       "title":  "Container CPU",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{container_label_com_docker_compose_service}}",
+                                           "expr":  "100 * sum by (container_label_com_docker_compose_service) (rate(container_cpu_usage_seconds_total{job=\"cadvisor\",container_label_com_docker_compose_project=\"attendance-phase1-fresh\"}[2m]))",
+                                           "refId":  "A",
+                                           "range":  true
+                                       }
+                                   ],
+                       "type":  "timeseries",
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "mode":  "multi"
+                                                   }
+                                   }
+                   },
+                   {
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "min":  0,
+                                                            "unit":  "bytes"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "id":  2,
+                       "gridPos":  {
+                                       "y":  0,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  12
+                                   },
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "attendance-prometheus"
+                                      },
+                       "title":  "Container RAM (working set)",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{container_label_com_docker_compose_service}}",
+                                           "expr":  "sum by (container_label_com_docker_compose_service) (container_memory_working_set_bytes{job=\"cadvisor\",container_label_com_docker_compose_project=\"attendance-phase1-fresh\"})",
+                                           "refId":  "A",
+                                           "range":  true
+                                       }
+                                   ],
+                       "type":  "timeseries",
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "mode":  "multi"
+                                                   }
+                                   }
+                   },
+                   {
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "min":  0,
+                                                            "unit":  "Bps"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "id":  3,
+                       "gridPos":  {
+                                       "y":  8,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  0
+                                   },
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "attendance-prometheus"
+                                      },
+                       "title":  "Container network receive",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{container_label_com_docker_compose_service}}",
+                                           "expr":  "sum by (container_label_com_docker_compose_service) (rate(container_network_receive_bytes_total{job=\"cadvisor\",container_label_com_docker_compose_project=\"attendance-phase1-fresh\",interface!=\"lo\"}[2m]))",
+                                           "refId":  "A",
+                                           "range":  true
+                                       }
+                                   ],
+                       "type":  "timeseries",
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "mode":  "multi"
+                                                   }
+                                   }
+                   },
+                   {
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "min":  0,
+                                                            "unit":  "Bps"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "id":  4,
+                       "gridPos":  {
+                                       "y":  8,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  12
+                                   },
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "attendance-prometheus"
+                                      },
+                       "title":  "Container network transmit",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{container_label_com_docker_compose_service}}",
+                                           "expr":  "sum by (container_label_com_docker_compose_service) (rate(container_network_transmit_bytes_total{job=\"cadvisor\",container_label_com_docker_compose_project=\"attendance-phase1-fresh\",interface!=\"lo\"}[2m]))",
+                                           "refId":  "A",
+                                           "range":  true
+                                       }
+                                   ],
+                       "type":  "timeseries",
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "mode":  "multi"
+                                                   }
+                                   }
+                   },
+                   {
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "min":  0,
+                                                            "unit":  "reqps"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "id":  5,
+                       "gridPos":  {
+                                       "y":  16,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  0
+                                   },
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "attendance-prometheus"
+                                      },
+                       "title":  "Nginx requests per second",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "Nginx",
+                                           "expr":  "rate(nginx_http_requests_total{job=\"nginx\"}[2m])",
+                                           "refId":  "A",
+                                           "range":  true
+                                       }
+                                   ],
+                       "type":  "timeseries",
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "mode":  "multi"
+                                                   }
+                                   }
+                   },
+                   {
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "min":  0,
+                                                            "unit":  "short"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "id":  6,
+                       "gridPos":  {
+                                       "y":  16,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  12
+                                   },
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "attendance-prometheus"
+                                      },
+                       "title":  "MySQL connections (current)",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "Connected",
+                                           "expr":  "mysql_global_status_threads_connected{job=\"mysql\"}",
+                                           "refId":  "A",
+                                           "range":  true
+                                       }
+                                   ],
+                       "type":  "timeseries",
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "mode":  "multi"
+                                                   }
+                                   }
+                   },
+                   {
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "min":  0,
+                                                            "unit":  "short"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "id":  7,
+                       "gridPos":  {
+                                       "y":  24,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  0
+                                   },
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "attendance-prometheus"
+                                      },
+                       "title":  "Nginx active connections",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "Active",
+                                           "expr":  "nginx_connections_active{job=\"nginx\"}",
+                                           "refId":  "A",
+                                           "range":  true
+                                       }
+                                   ],
+                       "type":  "timeseries",
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "mode":  "multi"
+                                                   }
+                                   }
+                   },
+                   {
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "min":  0,
+                                                            "unit":  "short"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "id":  8,
+                       "gridPos":  {
+                                       "y":  24,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  12
+                                   },
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "attendance-prometheus"
+                                      },
+                       "title":  "MySQL total connections",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "Total since start",
+                                           "expr":  "mysql_global_status_connections{job=\"mysql\"}",
+                                           "refId":  "A",
+                                           "range":  true
+                                       }
+                                   ],
+                       "type":  "timeseries",
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "mode":  "multi"
+                                                   }
+                                   }
+                   },
+                   {
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "min":  0,
+                                                            "unit":  "short"
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "id":  9,
+                       "gridPos":  {
+                                       "y":  32,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  0
+                                   },
+                       "datasource":  {
+                                          "type":  "prometheus",
+                                          "uid":  "attendance-prometheus"
+                                      },
+                       "title":  "Prometheus scrape target health",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{job}}",
+                                           "expr":  "up",
+                                           "refId":  "A",
+                                           "range":  true
+                                       }
+                                   ],
+                       "type":  "timeseries",
+                       "options":  {
+                                       "legend":  {
+                                                      "placement":  "bottom",
+                                                      "displayMode":  "list"
+                                                  },
+                                       "tooltip":  {
+                                                       "mode":  "multi"
+                                                   }
+                                   }
+                   }
+               ],
+    "tags":  [
+                 "attendance",
+                 "phase3"
+             ],
+    "editable":  false,
+    "timezone":  "Asia/Ho_Chi_Minh",
+    "refresh":  "15s",
+    "title":  "Attendance System Monitoring",
+    "uid":  "attendance-system"
+}

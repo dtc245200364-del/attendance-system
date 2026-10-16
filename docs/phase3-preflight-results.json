@@ -1,0 +1,49 @@
+﻿{
+    "passed":  8,
+    "runtimeMonitoring":  "not started: Docker storage read-only",
+    "failed":  2,
+    "checks":  [
+                   {
+                       "pass":  true,
+                       "name":  "Git root is workspace"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Compose configuration parses"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PowerShell scripts parse"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Dashboard JSON has nine PromQL panels"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Website"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "phpMyAdmin"
+                   },
+                   {
+                       "pass":  false,
+                       "name":  "Prometheus readiness"
+                   },
+                   {
+                       "pass":  false,
+                       "name":  "Grafana health"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  ".env unchanged"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Monitoring credentials ignored"
+                   }
+               ],
+    "reason":  "C drive nearly full; containerd input/output then read-only metadata filesystem",
+    "checkedAt":  "2026-10-16T18:32:15.2999433+07:00"
+}

@@ -1,6 +1,6 @@
 # Hệ thống điểm danh sinh viên — Đề 27
 
-Triển khai **Giai đoạn 1 và 2** bằng PHP 8.3, PDO, MySQL 8.4, phpMyAdmin, Docker Compose và Nginx reverse proxy. Mã nguồn được viết mới từ các file khung rỗng trong workspace; không lấy mã từ container điểm danh cũ.
+Triển khai **Giai đoạn 1–3** bằng PHP 8.3, PDO, MySQL 8.4, phpMyAdmin, Docker Compose, Nginx và Prometheus/Grafana. Mã nguồn được viết mới từ các file khung rỗng trong workspace; không lấy mã từ container điểm danh cũ.
 
 ## Khởi chạy trên Windows
 
@@ -9,14 +9,21 @@ Cần Docker Desktop đang chạy Linux containers và Docker Compose.
 ```powershell
 cd C:\Users\Admin\OneDrive\Desktop\attendance-system
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-env.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-monitoring.ps1
 docker compose config --quiet
+docker compose up -d db
+# Chờ db healthy, rồi khởi chạy backend trước Nginx:
+docker compose up -d --build web phpmyadmin
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-monitoring.ps1
 docker compose up -d --build
 docker compose ps
 ```
 
-Nếu `.env` đã có, bỏ qua bước `setup-env.ps1`; script cố ý không ghi đè. Hai mật khẩu được sinh độc lập bằng bộ sinh số ngẫu nhiên mật mã, không lưu trong Git. Nginx dùng cổng cố định 18087; phpMyAdmin dùng `PMA_PORT` (mặc định 18086). Biến `WEB_PORT=18085` trong `.env` cũ được giữ nguyên nhưng không còn được Compose sử dụng. Không đổi mật khẩu trong `.env` sau khi đã khởi tạo volume mà chưa đổi mật khẩu tài khoản trong MySQL tương ứng.
+Nếu `.env` đã có, bỏ qua `setup-env.ps1`; nếu `.env.grafana` và `secrets/` đã có, bỏ qua `setup-monitoring.ps1`. Cả hai script cố ý không ghi đè credentials. Mật khẩu sinh bằng bộ sinh số ngẫu nhiên mật mã, không lưu trong Git. Nginx dùng cổng cố định 18087; phpMyAdmin dùng `PMA_PORT` (mặc định 18086). Biến `WEB_PORT=18085` trong `.env` cũ được giữ nguyên nhưng không còn được Compose sử dụng. Không đổi mật khẩu trong `.env` sau khi đã khởi tạo volume mà chưa đổi mật khẩu tài khoản MySQL tương ứng.
 
 - Website qua Nginx: http://127.0.0.1:18087
+- Prometheus: http://127.0.0.1:19090
+- Grafana: http://127.0.0.1:13001 — user/mật khẩu trong `.env.grafana`, không dùng mật khẩu mặc định.
 - phpMyAdmin: http://localhost:18086 — server `db`, tài khoản `attendance_app`, mật khẩu `DB_PASSWORD` trong `.env`. Tài khoản này chỉ có SELECT/INSERT/UPDATE/DELETE; quản trị schema dùng `root` và `DB_ROOT_PASSWORD` khi cần.
 - Project Compose: `attendance-phase1-fresh`; volume: `attendance-phase1-fresh_phase1_data`.
 - MySQL và PHP web không publish cổng ra host. Nginx và phpMyAdmin chỉ bind loopback; cổng 18085 không còn được bộ này sử dụng.
@@ -67,7 +74,7 @@ Script kiểm tra cấu hình Compose, cú pháp toàn bộ PHP, rồi chạy HT
 
 ## Giới hạn phạm vi
 
-Ứng dụng hiện phục vụ bài thực hành trên máy cục bộ, **chưa có đăng nhập/phân quyền người dùng và HTTPS**. Đã kiểm tra giao diện bằng Chrome headless ở 390/768/1440px, gồm đo bố cục, gửi form và xem ảnh chụp thực tế; chưa kiểm tra trên thiết bị vật lý hoặc Safari/Firefox. Bảng dữ liệu cuộn ngang trong khung trên màn hình nhỏ. Nginx đã được triển khai ở Giai đoạn 2. Chưa triển khai Prometheus/Grafana, Loki/Promtail hoặc hardening toàn bộ stack; các file khung monitoring/logging vẫn rỗng. Không coi kết quả hiện tại là hoàn tất toàn bộ đề thi.
+Ứng dụng hiện phục vụ bài thực hành trên máy cục bộ, **chưa có đăng nhập/phân quyền người dùng và HTTPS**. Đã kiểm tra giao diện bằng Chrome headless ở 390/768/1440px; chưa kiểm tra trên thiết bị vật lý hoặc Safari/Firefox. Bảng dữ liệu cuộn ngang trên màn hình nhỏ. Nginx thuộc Giai đoạn 2, Prometheus/Grafana thuộc Giai đoạn 3. Chưa triển khai Loki/Promtail hoặc hardening toàn bộ stack; các file khung logging vẫn rỗng. Không coi kết quả hiện tại là hoàn tất toàn bộ đề thi.
 
 Repository Git riêng được tạo trong workspace để lưu mã nguồn Giai đoạn 1. GitHub: https://github.com/dtc245200364-del/attendance-system. Commit đầu tiên: `feat: implement attendance application and MySQL database`. Các commit tiếp theo và báo cáo tối thiểu 10 trang thuộc phần việc sau; không tạo ảnh minh chứng giả.
 
@@ -127,4 +134,43 @@ docker compose ps
 
 `proxy-test.ps1` tạo listener thử lỗi chỉ trong container (18088/18089) và PHP giả lập nội bộ (18090), lấy từ cấu hình Nginx thật, rút ngắn read timeout test xuống 1s. Dừng các tiến trình test trong `finally`; không dừng backend/DB production, không publish cổng test, không tạo endpoint debug trong document root. Script copy test vào tmpfs Nginx qua stdin vì Docker cp không ghi được container read-only. Cần Docker Desktop, không chạy nhiều lượt test đồng thời.
 
-Kết quả Giai đoạn 2: **242 assertions đạt / 0 thất bại ở lượt cuối của từng bộ**, 9/9 file PHP hợp lệ. Xem [biên bản](docs/phase2-validation.md) và [hướng dẫn tự chụp minh chứng](docs/phase2-screenshots.md). Ảnh test qua proxy lưu riêng trong `docs/evidence/phase2/`, không ghi đè minh chứng Giai đoạn 1. Chưa commit hoặc push thay đổi Giai đoạn 2.
+Kết quả Giai đoạn 2: **242 assertions đạt / 0 thất bại ở lượt cuối của từng bộ**, 9/9 file PHP hợp lệ. Xem [biên bản](docs/phase2-validation.md) và [hướng dẫn tự chụp minh chứng](docs/phase2-screenshots.md). Ảnh test qua proxy lưu riêng trong `docs/evidence/phase2/`. Giai đoạn 2 đã commit/push tại `70bdee6`; biên bản lưu hiện trạng tại lúc nghiệm thu.
+
+## Giai đoạn 3 — Prometheus và Grafana
+
+**Trạng thái hiện tại: đã triển khai và kiểm thử cục bộ.** Sau khi người dùng chuyển Docker disk image sang `D:\DockerDesktopData\DockerDesktopWSL`, Docker hoạt động bình thường. Giai đoạn 3 đạt **147/147 kiểm tra cuối**, 4 targets UP/0 DOWN, 9 panel có dữ liệu thật qua Prometheus và Grafana API; CPU/RAM/network có series cho 9 service. Xem [biên bản thực tế](docs/phase3-validation.md). Lỗi thiếu dung lượng trước đó được lưu như lịch sử, không phải trạng thái hiện tại.
+
+```mermaid
+flowchart LR
+    G[Grafana] --> P[Prometheus]
+    P --> C[cAdvisor]
+    P --> NE[Nginx Exporter]
+    P --> ME[MySQL Exporter]
+    NE -->|stub_status nội bộ| N[Nginx]
+    ME -->|USAGE only| M[MySQL]
+    C -->|cgroup và Docker API| D[Docker Desktop Linux VM]
+```
+
+Prometheus scrape mỗi **15s**, timeout **5s**, giữ TSDB tối đa **7 ngày / 1GB** trên volume riêng. Grafana có volume riêng và datasource provisioned `attendance-prometheus`. Dashboard **Attendance System Monitoring** tại http://127.0.0.1:13001/d/attendance-system được provision từ JSON trong `grafana/dashboards/`, không chứa số liệu giả: CPU, RAM working set, network RX/TX theo service, Nginx requests/s, MySQL current/total connections, Nginx active connections và scrape target health. `up` phản ánh scrape endpoint, không thay thế giám sát nghiệp vụ end-to-end. CPU biểu diễn phần trăm một CPU, có thể vượt 100% khi dùng nhiều core.
+
+Mạng `monitoring` là internal. Chỉ Prometheus/Grafana có thêm mạng UI và cổng loopback 19090/13001; exporter không publish host. Nginx Exporter có IP `.4` trên mạng proxy, là peer duy nhất được đọc listener `9091/stub_status`. MySQL Exporter nối monitoring + database, dùng credentials file mount read-only. Nginx không được nối mạng database; Prometheus/Grafana không nối database.
+
+`attendance_monitor` chỉ có **USAGE**, tối đa 3 kết nối; chỉ bật global status/variables, tắt collector cần đọc bảng, replication hoặc quyền PROCESS. Không cấp SELECT trên dữ liệu sinh viên, không dùng root hay user ứng dụng cho exporter. File `secrets/monitoring-user.sql` được sinh cục bộ; `CREATE USER IF NOT EXISTS` không đổi mật khẩu của tài khoản đã tồn tại. Nếu credentials mất/không khớp, cần xử lý có chủ đích, không xóa volume hoặc chạy lại sinh mật khẩu một cách tùy tiện.
+
+**cAdvisor:** chạy root để đọc cgroup của Linux VM, `cgroup: host`, đọc `/`, `/sys`, `/var/lib/docker` và Docker socket; không `privileged`, không thêm capabilities. Docker Desktop hiện cần `--containerd=/rootfs/run/containerd/containerd.sock` để đăng ký Docker factory; socket này nằm trong mount đã có. Tắt collector `disk` vì không cần cho CPU/RAM/network và tránh phải cấp quyền đọc thư mục riêng; không thu OOM events do không cấp `/dev/kmsg`. Docker/containerd socket mount `:ro` vẫn cho phép API thực hiện thao tác ghi nếu tiến trình bị chiếm quyền; đây là quyền nhạy cảm, không tương đương API read-only. Không public cAdvisor; Prometheus chỉ lưu metrics có label project này. cAdvisor vẫn có khả năng quan sát metadata container khác trong Docker VM; không thao tác dừng/sửa chúng. Không dùng stack này như một mô hình tenant isolation mạnh.
+
+Trên stack đã có (không khởi động lại DB): chạy setup monitoring **một lần**, sau đó `scripts/start-monitoring.ps1`. Script cấp tài khoản bằng root bên trong DB, không in mật khẩu, chỉ cập nhật Nginx và service giám sát. Cài mới làm theo thứ tự ở đầu README. Không commit `.env.grafana`, `secrets/`, log hay profile trình duyệt. Grafana chỉ đọc mật khẩu admin lúc khởi tạo database Grafana lần đầu; đổi file env không tự đổi mật khẩu tài khoản đã tồn tại.
+
+```powershell
+docker compose config --quiet
+docker compose exec prometheus promtool check config /etc/prometheus/prometheus.yml
+docker compose ps
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/monitoring-test.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/monitoring-access-test.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/acceptance-check.ps1
+```
+
+Không chạy test đồng thời. Bộ monitoring-test gửi 40 request thật, chờ hai scrape, kiểm tra target UP, nginx_up/mysql_up, tăng counter và cả PromQL lẫn truy vấn qua Grafana cho từng panel. Xem [kết quả thực tế](docs/phase3-validation.md) và [hướng dẫn chụp ảnh](docs/phase3-screenshots.md). Các template datasource/dashboard dựa trên [Grafana provisioning](https://grafana.com/docs/grafana/latest/administration/provisioning/); exporters theo [NGINX Exporter](https://github.com/nginx/nginx-prometheus-exporter), [MySQL Exporter](https://github.com/prometheus/mysqld_exporter), [cAdvisor](https://github.com/google/cadvisor/blob/master/docs/running.md).
+
+Chưa triển khai alert rules/Alertmanager hoặc Loki/Promtail. Các UI hiện dùng HTTP loopback; Prometheus không có đăng nhập. Chưa commit/push Giai đoạn 3.
