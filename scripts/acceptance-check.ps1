@@ -8,7 +8,7 @@ try {
     $config=docker compose config --format json | ConvertFrom-Json
     if ($LASTEXITCODE -ne 0) { throw 'Compose config failed' }
     Check ($config.name -eq 'attendance-phase1-fresh') 'separate Compose project'
-    Check (@($config.services.PSObject.Properties.Name).Count -eq 9) 'nine Phase 3 services; no logging services'
+    Check (@($config.services.PSObject.Properties.Name).Count -eq 11) 'eleven Phase 4 services including Loki and Promtail'
     Check ($config.networks.database.internal -eq $true) 'internal database network'
     Check (!$config.services.db.ports) 'no database host port'
     Check ($config.services.nginx.ports[0].host_ip -eq '127.0.0.1' -and $config.services.phpmyadmin.ports[0].host_ip -eq '127.0.0.1' -and !$config.services.web.ports) 'Nginx and phpMyAdmin loopback; backend unpublished'

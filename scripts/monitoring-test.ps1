@@ -1,3 +1,4 @@
+param([string]$ResultPath='docs/phase3-test-results.json')
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
 $prom='http://127.0.0.1:19090'
@@ -90,9 +91,9 @@ try {
     Check ($config.services.prometheus.ports[0].host_ip -eq '127.0.0.1' -and $config.services.grafana.ports[0].host_ip -eq '127.0.0.1') 'monitoring UIs bound only to loopback'
     Check (!$config.services.cadvisor.privileged) 'cAdvisor not privileged'
     $names=@($config.services.PSObject.Properties.Name)
-    Check (!($names -contains 'loki') -and !($names -contains 'promtail')) 'no Loki or Promtail deployed'
+    Check (($names -contains 'loki') -and ($names -contains 'promtail')) 'Phase 4 logging services configured alongside monitoring'
     $output=@{checkedAt=[DateTimeOffset]::Now.ToString('o');passed=$script:passed;failed=$script:failed;checks=$checks;panels=$panels;traffic=@{requests=40;nginxBefore=$nginxBefore;nginxAfter=$nginxAfter;mysqlBefore=$mysqlBefore;mysqlAfter=$mysqlAfter;webCpuBefore=$webCpuBefore;webCpuAfter=$webCpuAfter;webRxBefore=$webRxBefore;webRxAfter=$webRxAfter};targets=@($targets.data.activeTargets | ForEach-Object { @{job=$_.labels.job;health=$_.health;lastError=$_.lastError} })}
-    $path=Join-Path $root 'docs/phase3-test-results.json'
+    $path=Join-Path $root $ResultPath
     [IO.File]::WriteAllText($path,($output | ConvertTo-Json -Depth 20),(New-Object Text.UTF8Encoding($false)))
     Write-Output "RESULT: $script:passed monitoring assertions passed; $script:failed failed"
     if ($script:failed) { exit 1 }

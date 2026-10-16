@@ -1,6 +1,25 @@
 <?php
 declare(strict_types=1);
 date_default_timezone_set('Asia/Ho_Chi_Minh');
+// Fixed fields only: never emit SQL, form data, session IDs or user supplied text.
+function attendance_log(string $event, string $level, int $status): void {
+    $routes = ['index.php', 'classes.php', 'students.php', 'attendance.php', 'history.php', 'statistics.php'];
+    $route = basename($_SERVER['SCRIPT_NAME'] ?? '');
+    $requestId = $_SERVER['HTTP_X_REQUEST_ID'] ?? '';
+    $method = $_SERVER['REQUEST_METHOD'] ?? '';
+    error_log('ATTENDANCE_EVENT ' . json_encode([
+        'source' => 'php', 'event' => $event, 'level' => $level, 'status' => $status,
+        'route' => in_array($route, $routes, true) ? $route : 'other',
+        'method' => in_array($method, ['GET', 'POST', 'HEAD', 'OPTIONS'], true) ? $method : 'OTHER',
+        'request_id' => is_string($requestId) && preg_match('/^[a-f0-9]{32}$/D', $requestId) ? $requestId : 'none',
+    ], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+}
+register_shutdown_function(static function (): void {
+    $status = http_response_code() ?: 200;
+    $last = error_get_last();
+    if ($last && in_array($last['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) $status = 500;
+    attendance_log('request_completed', $status >= 500 ? 'error' : ($status >= 400 ? 'warn' : 'info'), $status);
+});
 session_start();
 header('Content-Type: text/html; charset=utf-8');
 header("Content-Security-Policy: default-src 'self'; style-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
@@ -51,7 +70,7 @@ function post_action(callable $callback): void {
     }
 }
 set_exception_handler(function (Throwable $ex): void {
-    error_log((string)$ex); http_response_code(500);
+    attendance_log('unhandled_exception', 'error', 500); http_response_code(500);
     echo '<!doctype html><html lang="vi"><meta charset="utf-8"><title>Lỗi hệ thống</title><p>Không thể xử lý yêu cầu. Vui lòng thử lại sau.</p></html>';
 });
 function page_start(string $title, string $active): void {

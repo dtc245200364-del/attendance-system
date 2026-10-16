@@ -1,0 +1,70 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+positions:
+  filename: /positions/positions.yml
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+    batchwait: 1s
+    batchsize: 262144
+scrape_configs:
+  - job_name: attendance
+    pipeline_stages:
+      - docker: {}
+      - match:
+          selector: '{service="nginx"}'
+          stages:
+            - regex:
+                expression: '^\{"source":"nginx","method":"(?P<method>GET|POST|HEAD|OPTIONS|OTHER)","route":"(?P<route>[a-z]+)","status":(?P<status>[1-5][0-9]{2}),"level":"(?P<level>info|warn|error)","request_id":"(?P<request_id>[a-f0-9]{32})"\}\s*$'
+            - labels:
+                level:
+                status:
+      - match:
+          selector: '{service="php"}'
+          stages:
+            - regex:
+                expression: 'ATTENDANCE_EVENT (?P<safe>\{"source":"php","event":"(?:request_completed|unhandled_exception)","level":"(?P<level>info|warn|error)","status":(?P<status>[1-5][0-9]{2}),"route":"(?:[a-z]+\.php|other)","method":"(?:GET|POST|HEAD|OPTIONS|OTHER)","request_id":"(?:[a-f0-9]{32}|none)"\})\s*$'
+            - labels:
+                level:
+                status:
+            - output:
+                source: safe
+      - match:
+          selector: '{service="mysql"}'
+          stages:
+            - regex:
+                expression: '\[(?P<level>System|Warning|Error|Note)\] \[(?P<code>MY-[0-9]{6})\]'
+            - labels:
+                level:
+            - template:
+                source: safe
+                template: '{"source":"mysql","level":"{{ .level }}","code":"{{ .code }}"}'
+            - output:
+                source: safe
+      - match:
+          selector: '{job="attendance",level!~"info|warn|error|System|Warning|Error|Note"}'
+          action: drop
+          drop_counter_reason: not_allowlisted
+      - labeldrop: [filename, stream]
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: attendance
+          service: nginx
+          container: attendance-phase1-fresh-nginx-1
+          log_type: access
+          __path__: /logs/nginx/*-json.log
+      - targets: [localhost]
+        labels:
+          job: attendance
+          service: php
+          container: attendance-phase1-fresh-web-1
+          log_type: application
+          __path__: /logs/web/*-json.log
+      - targets: [localhost]
+        labels:
+          job: attendance
+          service: mysql
+          container: attendance-phase1-fresh-db-1
+          log_type: server
+          __path__: /logs/db/*-json.log

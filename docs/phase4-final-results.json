@@ -1,0 +1,184 @@
+{
+    "checks":  [
+                   {
+                       "pass":  true,
+                       "name":  "nginx -t"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "promtool config validation"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "all four MySQL table counts and SHA256 unchanged"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "real 404 evidence exists before logging restart"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "positions persisted before restart"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Loki ready after controlled restart"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "same real 404 survives Loki restart"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Promtail positions and readiness survive restart"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "all four original host ports preserved on loopback"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "four Prometheus targets remain UP"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "11 services running; every configured Docker healthcheck healthy; no OOM"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "free space above 2 GiB on C and 5 GiB on D"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Docker Desktop settings and disk image on D confirmed"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "secrets and generated log mounts ignored"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "candidate project files contain no actual local passwords or recognizable private tokens/keys"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "nothing staged or committed by Phase 4 work"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "HEAD remains Commit 3 (344f50c)"
+                   }
+               ],
+    "checkedAt":  "2026-10-16T20:51:29.1300978+07:00",
+    "passed":  17,
+    "freeBytes":  {
+                      "D":  107768975360,
+                      "C":  9316823040
+                  },
+    "targetsDown":  0,
+    "dockerDiskDirectory":  "D:\\DockerDesktopData\\DockerDesktopWSL",
+    "candidateFilesScanned":  107,
+    "failed":  0,
+    "targetsUp":  4,
+    "services":  [
+                     {
+                         "id":  "3e2aeb944df40dd2a9ab227b498a0896b0fd4e23007d2c1a17a653906634205d",
+                         "service":  "cadvisor",
+                         "health":  "healthy",
+                         "oomKilled":  false,
+                         "running":  true,
+                         "startedAt":  "2026-10-16T13:05:02.82703548Z",
+                         "restartCount":  0
+                     },
+                     {
+                         "id":  "d43c618c0cf91a903a7e48131efc08ea274901abe4aa6e0fc93f189a21eb9e3a",
+                         "service":  "db",
+                         "health":  "healthy",
+                         "oomKilled":  false,
+                         "running":  true,
+                         "startedAt":  "2026-10-16T12:55:32.406097037Z",
+                         "restartCount":  0
+                     },
+                     {
+                         "id":  "cb9424b0ddfc15e95ad3599199cc5df88af9228250bf30facb7e400caff3aaaf",
+                         "service":  "grafana",
+                         "health":  null,
+                         "oomKilled":  false,
+                         "running":  true,
+                         "startedAt":  "2026-10-16T13:43:22.503995864Z",
+                         "restartCount":  0
+                     },
+                     {
+                         "id":  "14e02f0910302c4902bcb6db205c3f24ef13801cac5dba0d62f9811c23f0716d",
+                         "service":  "loki",
+                         "health":  null,
+                         "oomKilled":  false,
+                         "running":  true,
+                         "startedAt":  "2026-10-16T13:51:07.463968803Z",
+                         "restartCount":  0
+                     },
+                     {
+                         "id":  "674578f09404516f1d4e937a26fa56ba709ca5334e0272e62c0f3b3121786585",
+                         "service":  "mysql-exporter",
+                         "health":  null,
+                         "oomKilled":  false,
+                         "running":  true,
+                         "startedAt":  "2026-10-16T13:02:45.637595073Z",
+                         "restartCount":  0
+                     },
+                     {
+                         "id":  "1dcc04e567a041a2658b9a5c0130cf52df2b5547cb2ce9b06597ce7f9c093b86",
+                         "service":  "nginx",
+                         "health":  "healthy",
+                         "oomKilled":  false,
+                         "running":  true,
+                         "startedAt":  "2026-10-16T13:02:46.074928987Z",
+                         "restartCount":  0
+                     },
+                     {
+                         "id":  "af027b11b130506e78113a2ca93c92040f42605bfab8c044cd848f099f9d762e",
+                         "service":  "nginx-exporter",
+                         "health":  null,
+                         "oomKilled":  false,
+                         "running":  true,
+                         "startedAt":  "2026-10-16T13:02:45.447733818Z",
+                         "restartCount":  0
+                     },
+                     {
+                         "id":  "71095796f6e2ea75a1685bb41b545c53644cde828cc85758514464ab6b7bfb68",
+                         "service":  "phpmyadmin",
+                         "health":  null,
+                         "oomKilled":  false,
+                         "running":  true,
+                         "startedAt":  "2026-10-16T12:55:32.428058946Z",
+                         "restartCount":  0
+                     },
+                     {
+                         "id":  "35f5b69a3de72142a3f472d97f74fee468c2d095876f29d6cdd57d9268d99d4b",
+                         "service":  "prometheus",
+                         "health":  null,
+                         "oomKilled":  false,
+                         "running":  true,
+                         "startedAt":  "2026-10-16T13:02:46.729041734Z",
+                         "restartCount":  0
+                     },
+                     {
+                         "id":  "02e8aeebd9499cf76d70a3919bf9c49ee449aedaa5ad9a538d3ec3fa42bbb894",
+                         "service":  "promtail",
+                         "health":  "healthy",
+                         "oomKilled":  false,
+                         "running":  true,
+                         "startedAt":  "2026-10-16T13:51:06.844286243Z",
+                         "restartCount":  0
+                     },
+                     {
+                         "id":  "c8f620804eb85f0ba043d75d408956d2d2695f7060c1e990c31302dac480706e",
+                         "service":  "web",
+                         "health":  "healthy",
+                         "oomKilled":  false,
+                         "running":  true,
+                         "startedAt":  "2026-10-16T13:43:39.90753169Z",
+                         "restartCount":  0
+                     }
+                 ]
+}

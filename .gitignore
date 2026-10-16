@@ -18,3 +18,5 @@ data/
 .DS_Store
 Thumbs.db
 secrets/
+# Generated local read-only log mounts; regenerate after container recreation.
+docker-compose.override.yml

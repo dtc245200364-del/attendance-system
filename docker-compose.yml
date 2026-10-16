@@ -1,5 +1,43 @@
 name: attendance-phase1-fresh
 services:
+  promtail:
+    # EOL 2026-03-02: exam requirement only; migrate to Alloy for production.
+    image: grafana/promtail:3.5.12
+    command: [-config.file=/etc/promtail/config.yml]
+    user: '0:0'
+    volumes:
+      - ./promtail/config.yml:/etc/promtail/config.yml:ro
+      - ./promtail/healthcheck.sh:/etc/promtail/healthcheck.sh:ro
+      - promtail_positions:/positions
+    networks: [monitoring]
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,size=8m']
+    mem_limit: 128m
+    cpus: 0.25
+    healthcheck:
+      test: [CMD, /usr/bin/bash, /etc/promtail/healthcheck.sh]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+  loki:
+    image: grafana/loki:3.7.8
+    command: [-config.file=/etc/loki/config.yml]
+    user: '10001:10001'
+    volumes:
+      - ./loki/config.yml:/etc/loki/config.yml:ro
+      - loki_data:/loki
+    networks: [monitoring]
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,size=16m']
+    mem_limit: 512m
+    cpus: 0.5
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
   prometheus:
     image: prom/prometheus:v3.15.0
     command: [--config.file=/etc/prometheus/prometheus.yml, --storage.tsdb.path=/prometheus, --storage.tsdb.retention.time=7d, --storage.tsdb.retention.size=1GB]
@@ -172,6 +210,8 @@ networks:
   database:
     internal: true
 volumes:
+  promtail_positions:
+  loki_data:
   prometheus_data:
   grafana_data:
   phase1_data:

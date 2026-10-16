@@ -1,0 +1,219 @@
+{
+    "schemaVersion":  39,
+    "time":  {
+                 "to":  "now",
+                 "from":  "now-15m"
+             },
+    "templating":  {
+                       "list":  [
+                                    {
+                                        "refresh":  1,
+                                        "allValue":  ".*",
+                                        "type":  "query",
+                                        "includeAll":  true,
+                                        "label":  "Service",
+                                        "datasource":  {
+                                                           "type":  "loki",
+                                                           "uid":  "attendance-loki"
+                                                       },
+                                        "name":  "service",
+                                        "multi":  true,
+                                        "query":  "label_values({job=\"attendance\"}, service)",
+                                        "current":  {
+                                                        "text":  "All",
+                                                        "value":  "$__all"
+                                                    }
+                                    },
+                                    {
+                                        "query":  "info,warn,error,System,Warning,Error,Note",
+                                        "current":  {
+                                                        "text":  "All",
+                                                        "value":  "$__all"
+                                                    },
+                                        "allValue":  ".*",
+                                        "includeAll":  true,
+                                        "name":  "level",
+                                        "type":  "custom",
+                                        "label":  "Level",
+                                        "multi":  true
+                                    }
+                                ]
+                   },
+    "version":  1,
+    "panels":  [
+                   {
+                       "fieldConfig":  {
+                                           "defaults":  {
+
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "id":  1,
+                       "gridPos":  {
+                                       "y":  0,
+                                       "w":  24,
+                                       "h":  9,
+                                       "x":  0
+                                   },
+                       "datasource":  {
+                                          "type":  "loki",
+                                          "uid":  "attendance-loki"
+                                      },
+                       "title":  "Service logs",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{service}}",
+                                           "datasource":  {
+                                                              "type":  "loki",
+                                                              "uid":  "attendance-loki"
+                                                          },
+                                           "expr":  "{job=\"attendance\",service=~\"$service\",level=~\"$level\"}",
+                                           "refId":  "A",
+                                           "queryType":  "range"
+                                       }
+                                   ],
+                       "type":  "logs",
+                       "options":  {
+                                       "sortOrder":  "Descending",
+                                       "showTime":  true,
+                                       "wrapLogMessage":  true,
+                                       "showLabels":  false
+                                   }
+                   },
+                   {
+                       "fieldConfig":  {
+                                           "defaults":  {
+
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "id":  2,
+                       "gridPos":  {
+                                       "y":  9,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  0
+                                   },
+                       "datasource":  {
+                                          "type":  "loki",
+                                          "uid":  "attendance-loki"
+                                      },
+                       "title":  "Nginx HTTP 404",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{service}}",
+                                           "datasource":  {
+                                                              "type":  "loki",
+                                                              "uid":  "attendance-loki"
+                                                          },
+                                           "expr":  "{job=\"attendance\",service=\"nginx\"} | json | status = 404",
+                                           "refId":  "A",
+                                           "queryType":  "range"
+                                       }
+                                   ],
+                       "type":  "logs",
+                       "options":  {
+                                       "sortOrder":  "Descending",
+                                       "showTime":  true,
+                                       "wrapLogMessage":  true,
+                                       "showLabels":  false
+                                   }
+                   },
+                   {
+                       "fieldConfig":  {
+                                           "defaults":  {
+
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "id":  3,
+                       "gridPos":  {
+                                       "y":  9,
+                                       "w":  12,
+                                       "h":  8,
+                                       "x":  12
+                                   },
+                       "datasource":  {
+                                          "type":  "loki",
+                                          "uid":  "attendance-loki"
+                                      },
+                       "title":  "PHP application logs",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{service}}",
+                                           "datasource":  {
+                                                              "type":  "loki",
+                                                              "uid":  "attendance-loki"
+                                                          },
+                                           "expr":  "{job=\"attendance\",service=\"php\",level=~\"$level\"}",
+                                           "refId":  "A",
+                                           "queryType":  "range"
+                                       }
+                                   ],
+                       "type":  "logs",
+                       "options":  {
+                                       "sortOrder":  "Descending",
+                                       "showTime":  true,
+                                       "wrapLogMessage":  true,
+                                       "showLabels":  false
+                                   }
+                   },
+                   {
+                       "fieldConfig":  {
+                                           "defaults":  {
+
+                                                        },
+                                           "overrides":  [
+
+                                                         ]
+                                       },
+                       "id":  4,
+                       "gridPos":  {
+                                       "y":  17,
+                                       "w":  24,
+                                       "h":  8,
+                                       "x":  0
+                                   },
+                       "datasource":  {
+                                          "type":  "loki",
+                                          "uid":  "attendance-loki"
+                                      },
+                       "title":  "Log entries per service (rolling 5 minutes)",
+                       "targets":  [
+                                       {
+                                           "legendFormat":  "{{service}}",
+                                           "datasource":  {
+                                                              "type":  "loki",
+                                                              "uid":  "attendance-loki"
+                                                          },
+                                           "expr":  "sum by (service) (count_over_time({job=\"attendance\",service=~\"$service\"}[5m]))",
+                                           "refId":  "A",
+                                           "queryType":  "range"
+                                       }
+                                   ],
+                       "type":  "timeseries",
+                       "options":  {
+                                       "sortOrder":  "Descending",
+                                       "showTime":  true,
+                                       "wrapLogMessage":  true,
+                                       "showLabels":  false
+                                   }
+                   }
+               ],
+    "tags":  [
+                 "attendance",
+                 "loki",
+                 "phase4"
+             ],
+    "editable":  false,
+    "timezone":  "browser",
+    "refresh":  "10s",
+    "title":  "Attendance System Logs",
+    "uid":  "attendance-logs"
+}

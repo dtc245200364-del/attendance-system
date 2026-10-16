@@ -1,0 +1,312 @@
+{
+    "passed":  54,
+    "panels":  [
+                   {
+                       "title":  "Container CPU",
+                       "expr":  "100 * sum by (container_label_com_docker_compose_service) (rate(container_cpu_usage_seconds_total{job=\"cadvisor\",container_label_com_docker_compose_project=\"attendance-phase1-fresh\"}[2m]))",
+                       "series":  11,
+                       "grafanaHasValues":  true
+                   },
+                   {
+                       "title":  "Container RAM (working set)",
+                       "expr":  "sum by (container_label_com_docker_compose_service) (container_memory_working_set_bytes{job=\"cadvisor\",container_label_com_docker_compose_project=\"attendance-phase1-fresh\"})",
+                       "series":  11,
+                       "grafanaHasValues":  true
+                   },
+                   {
+                       "title":  "Container network receive",
+                       "expr":  "sum by (container_label_com_docker_compose_service) (rate(container_network_receive_bytes_total{job=\"cadvisor\",container_label_com_docker_compose_project=\"attendance-phase1-fresh\",interface!=\"lo\"}[2m]))",
+                       "series":  11,
+                       "grafanaHasValues":  true
+                   },
+                   {
+                       "title":  "Container network transmit",
+                       "expr":  "sum by (container_label_com_docker_compose_service) (rate(container_network_transmit_bytes_total{job=\"cadvisor\",container_label_com_docker_compose_project=\"attendance-phase1-fresh\",interface!=\"lo\"}[2m]))",
+                       "series":  11,
+                       "grafanaHasValues":  true
+                   },
+                   {
+                       "title":  "Nginx requests per second",
+                       "expr":  "rate(nginx_http_requests_total{job=\"nginx\"}[2m])",
+                       "series":  1,
+                       "grafanaHasValues":  true
+                   },
+                   {
+                       "title":  "MySQL connections (current)",
+                       "expr":  "mysql_global_status_threads_connected{job=\"mysql\"}",
+                       "series":  1,
+                       "grafanaHasValues":  true
+                   },
+                   {
+                       "title":  "Nginx active connections",
+                       "expr":  "nginx_connections_active{job=\"nginx\"}",
+                       "series":  1,
+                       "grafanaHasValues":  true
+                   },
+                   {
+                       "title":  "MySQL total connections",
+                       "expr":  "mysql_global_status_connections{job=\"mysql\"}",
+                       "series":  1,
+                       "grafanaHasValues":  true
+                   },
+                   {
+                       "title":  "Prometheus scrape target health",
+                       "expr":  "up",
+                       "series":  4,
+                       "grafanaHasValues":  true
+                   }
+               ],
+    "failed":  0,
+    "targets":  [
+                    {
+                        "lastError":  "",
+                        "health":  "up",
+                        "job":  "cadvisor"
+                    },
+                    {
+                        "lastError":  "",
+                        "health":  "up",
+                        "job":  "mysql"
+                    },
+                    {
+                        "lastError":  "",
+                        "health":  "up",
+                        "job":  "nginx"
+                    },
+                    {
+                        "lastError":  "",
+                        "health":  "up",
+                        "job":  "prometheus"
+                    }
+                ],
+    "traffic":  {
+                    "webRxBefore":  77134,
+                    "webCpuAfter":  2.059918,
+                    "webCpuBefore":  1.370837,
+                    "nginxAfter":  747,
+                    "webRxAfter":  568942,
+                    "requests":  40,
+                    "mysqlAfter":  1943,
+                    "nginxBefore":  642,
+                    "mysqlBefore":  1834
+                },
+    "checks":  [
+                   {
+                       "pass":  true,
+                       "name":  "Grafana health/database"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "four configured Prometheus targets"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "target UP: prometheus"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "target UP: cadvisor"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "target UP: nginx"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "target UP: mysql"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "nginx_up = 1 (exporter reaches Nginx)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "mysql_up = 1 (exporter authenticates to MySQL)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "provisioned default Prometheus datasource"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Grafana datasource health"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "dashboard provisioned with expected title"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "nine real-metric panels provisioned"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "40 real website requests generated"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Nginx request counter increased by at least 40"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "MySQL connection counter increased with website traffic"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "web container CPU counter increased during real traffic"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "web container network receive counter increased during real traffic"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "per-container metric container_cpu_usage_seconds_total for web"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "per-container metric container_memory_working_set_bytes for web"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "per-container metric container_network_receive_bytes_total for web"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "per-container metric container_cpu_usage_seconds_total for nginx"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "per-container metric container_memory_working_set_bytes for nginx"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "per-container metric container_network_receive_bytes_total for nginx"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "per-container metric container_cpu_usage_seconds_total for db"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "per-container metric container_memory_working_set_bytes for db"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "per-container metric container_network_receive_bytes_total for db"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "per-container metric container_cpu_usage_seconds_total for phpmyadmin"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "per-container metric container_memory_working_set_bytes for phpmyadmin"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "per-container metric container_network_receive_bytes_total for phpmyadmin"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "cAdvisor stored memory series belong only to this project"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PromQL has real data: Container CPU"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Grafana panel datasource returns values: Container CPU"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PromQL has real data: Container RAM (working set)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Grafana panel datasource returns values: Container RAM (working set)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PromQL has real data: Container network receive"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Grafana panel datasource returns values: Container network receive"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PromQL has real data: Container network transmit"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Grafana panel datasource returns values: Container network transmit"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PromQL has real data: Nginx requests per second"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Grafana panel datasource returns values: Nginx requests per second"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PromQL has real data: MySQL connections (current)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Grafana panel datasource returns values: MySQL connections (current)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PromQL has real data: Nginx active connections"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Grafana panel datasource returns values: Nginx active connections"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PromQL has real data: MySQL total connections"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Grafana panel datasource returns values: MySQL total connections"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PromQL has real data: Prometheus scrape target health"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Grafana panel datasource returns values: Prometheus scrape target health"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no host port on cadvisor"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no host port on nginx-exporter"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no host port on mysql-exporter"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "monitoring UIs bound only to loopback"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "cAdvisor not privileged"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Phase 4 logging services configured alongside monitoring"
+                   }
+               ],
+    "checkedAt":  "2026-10-16T20:49:13.9870990+07:00"
+}

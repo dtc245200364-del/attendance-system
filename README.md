@@ -173,4 +173,60 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/acceptance-check.ps1
 
 Không chạy test đồng thời. Bộ monitoring-test gửi 40 request thật, chờ hai scrape, kiểm tra target UP, nginx_up/mysql_up, tăng counter và cả PromQL lẫn truy vấn qua Grafana cho từng panel. Xem [kết quả thực tế](docs/phase3-validation.md) và [hướng dẫn chụp ảnh](docs/phase3-screenshots.md). Các template datasource/dashboard dựa trên [Grafana provisioning](https://grafana.com/docs/grafana/latest/administration/provisioning/); exporters theo [NGINX Exporter](https://github.com/nginx/nginx-prometheus-exporter), [MySQL Exporter](https://github.com/prometheus/mysqld_exporter), [cAdvisor](https://github.com/google/cadvisor/blob/master/docs/running.md).
 
-Chưa triển khai alert rules/Alertmanager hoặc Loki/Promtail. Các UI hiện dùng HTTP loopback; Prometheus không có đăng nhập. Chưa commit/push Giai đoạn 3.
+Giai đoạn 3 đã commit/push tại `344f50c`. Chưa triển khai alert rules/Alertmanager. Các UI dùng HTTP loopback; Prometheus không có đăng nhập.
+
+## Giai đoạn 4 — Loki và Promtail
+
+Loki `3.7.8` lưu log trên volume `loki_data`, dùng TSDB v13, compactor retention **168 giờ**, index 24 giờ. Promtail `3.5.12` thu log thật của Nginx, PHP và mã sự kiện máy chủ MySQL; lưu offset trên volume `promtail_positions`. Hai service chỉ thuộc mạng `monitoring` nội bộ, **không publish cổng host**, có giới hạn CPU/RAM. Grafana giữ datasource Prometheus mặc định và dashboard 9 panel; thêm datasource `attendance-loki` và dashboard [Attendance System Logs](http://127.0.0.1:13001/d/attendance-logs).
+
+**Promtail đã EOL từ 02/03/2026**, không còn được bảo trì. Người dùng đã xác nhận bắt buộc dùng cho đề thi cục bộ. Với triển khai lâu dài, chuyển sang [Grafana Alloy](https://grafana.com/docs/alloy/latest/set-up/migrate/from-promtail/). Không dùng cấu hình này như một hệ thống production được hỗ trợ.
+
+```mermaid
+flowchart LR
+    N[Nginx JSON access log] --> T[Promtail: lọc trường cho phép]
+    P[PHP structured application log] --> T
+    M[MySQL server log: chỉ level và mã MY] --> T
+    T --> L[Loki: volume riêng, retention 7 ngày]
+    G[Grafana: 127.0.0.1:13001] --> L
+    G --> PR[Prometheus giữ nguyên]
+```
+
+Áp dụng trên stack hiện có, từ đúng thư mục dự án (không chạy `down`):
+
+```powershell
+docker compose config --quiet
+docker compose up -d --build --no-deps web
+docker compose exec nginx nginx -t
+# Chỉ reload sau khi nginx -t thành công:
+docker compose exec nginx nginx -s reload
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-logging.ps1
+# Nhận datasource mới, giữ nguyên database Grafana trên volume:
+docker compose restart grafana
+```
+
+Script start yêu cầu Nginx/PHP/MySQL đang chạy, xác minh project/service/log driver rồi sinh `docker-compose.override.yml` cục bộ, được Git và Docker build bỏ qua. File này chỉ mount **đúng ba file JSON log** read-only, không mount thư mục metadata container, Docker socket hoặc log dự án khác. Compose tự đọc override. **Chạy lại script sau khi recreate Nginx/web/db**; nếu Docker xoay file log, restart Promtail để gắn lại file hiện tại, rồi kiểm tra log mới tới Loki. Không tạo file override khác cùng tên. Với stack cài mới, hoàn thành bước khởi tạo ứng dụng và monitoring bên trên trước, rồi mới chạy script logging.
+
+Promtail dùng UID 0 để đọc file Docker thuộc root; bỏ toàn bộ capabilities, root filesystem read-only, chỉ ghi positions trên volume riêng. Loki dùng UID 10001. Không cấp privileged hoặc mount socket cho hai dịch vụ mới. cAdvisor vẫn giữ quyền đã ghi trong Giai đoạn 3.
+
+Nginx ghi method giới hạn, route từ allowlist, status, level và request ID do edge tạo; không ghi IP/query/cookie/body vào access log mới. PHP ghi sự kiện `request_completed` và exception chung, không ghi message/stack trace/SQL. Promtail bỏ mọi dòng không khớp định dạng được duyệt; log MySQL chỉ giữ severity và mã `MY-xxxxxx`, không giữ câu SQL hay nội dung thông báo. Các nhãn là `job`, `service`, `container`, `log_type`, `level`, `status` nếu có; request ID chỉ ở nội dung để tránh cardinality cao. Raw log Docker của Apache/Nginx error có thể vẫn chứa dữ liệu request, **không chuyển những dòng đó vào Loki**, không đưa raw log lên GitHub.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/logging-test.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/monitoring-test.ps1 -ResultPath docs/phase4-monitoring-results.json
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/monitoring-access-test.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/acceptance-check.ps1
+# Trước/sau regression có thể lưu fingerprint bằng scripts/data-fingerprint.ps1.
+# Chỉ chạy final check sau khi đã có hai file fingerprint và kết quả logging:
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/logging-final-check.ps1
+```
+
+Trong Grafana → Explore → datasource **Loki**, dùng:
+
+```logql
+{job="attendance",service="nginx"}
+{job="attendance",service="nginx"} | json | status = 404
+sum by (service) (count_over_time({job="attendance"}[5m]))
+```
+
+Tạo 404 mới tại http://127.0.0.1:18087/phase4-log-proof; chọn Last 15 minutes và Refresh. Log MySQL chủ yếu phát sinh lúc khởi động: tăng khoảng thời gian nếu chưa thấy, không restart DB để tạo log. Xem [biên bản nghiệm thu](docs/phase4-validation.md) và [hướng dẫn tự chụp minh chứng thật](docs/phase4-screenshots.md). Chưa commit/push Giai đoạn 4.
