@@ -1,7 +1,7 @@
-param([int]$Port = 18085, [int]$DebugPort = 19227)
+param([int]$Port = 18087, [int]$DebugPort = 19227, [string]$EvidenceDirectory = 'docs/evidence/phase2')
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-$evidence = Join-Path $root 'docs/evidence'
+$evidence = Join-Path $root $EvidenceDirectory
 New-Item -ItemType Directory -Force $evidence | Out-Null
 $chrome = 'C:/Program Files/Google/Chrome/Application/chrome.exe'
 if (!(Test-Path $chrome)) { throw 'Google Chrome required' }

@@ -1,5 +1,6 @@
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
+$gitSafe = 'safe.directory=' + $root.Replace('\','/')
 $passed=0
 function Check($ok,$label) { if (!$ok) { throw "FAIL: $label" }; $script:passed++; Write-Output "PASS: $label" }
 Push-Location $root
@@ -7,11 +8,11 @@ try {
     $config=docker compose config --format json | ConvertFrom-Json
     if ($LASTEXITCODE -ne 0) { throw 'Compose config failed' }
     Check ($config.name -eq 'attendance-phase1-fresh') 'separate Compose project'
-    Check (@($config.services.PSObject.Properties.Name).Count -eq 3) 'only three Phase 1 services'
+    Check (@($config.services.PSObject.Properties.Name).Count -eq 4) 'only four Phase 2 services'
     Check ($config.networks.database.internal -eq $true) 'internal database network'
     Check (!$config.services.db.ports) 'no database host port'
-    Check ($config.services.web.ports[0].host_ip -eq '127.0.0.1' -and $config.services.phpmyadmin.ports[0].host_ip -eq '127.0.0.1') 'web and phpMyAdmin bind loopback'
-    $webPort=$config.services.web.ports[0].published
+    Check ($config.services.nginx.ports[0].host_ip -eq '127.0.0.1' -and $config.services.phpmyadmin.ports[0].host_ip -eq '127.0.0.1' -and !$config.services.web.ports) 'Nginx and phpMyAdmin loopback; backend unpublished'
+    $webPort=$config.services.nginx.ports[0].published
     $pmaPort=$config.services.phpmyadmin.ports[0].published
     Check ($webPort -ne $pmaPort -and $webPort -ne '8085' -and $pmaPort -ne '8086') 'new distinct host ports'
     $site=Invoke-WebRequest -UseBasicParsing "http://127.0.0.1:$webPort/"
@@ -38,12 +39,12 @@ try {
         foreach ($secret in @($envValues['DB_PASSWORD'],$envValues['DB_ROOT_PASSWORD'])) { if ($content.Contains($secret)) { $hits+=$file.FullName } }
     }
     Check ($hits.Count -eq 0) 'no password copied into source docs or tests'
-    $tracked=@(git ls-files -- .env '.env.*')
+    $tracked=@(git -c $gitSafe ls-files -- .env '.env.*')
     if ($LASTEXITCODE -ne 0) { throw 'Cannot verify Git tracking' }
     Check (@($tracked | Where-Object { $_ -notlike '*.env.example' }).Count -eq 0) 'no secret env file tracked in Git'
-    git check-ignore -q .env
+    git -c $gitSafe check-ignore -q .env
     Check ($LASTEXITCODE -eq 0) '.env ignored by Git'
-    $history=@(git log --all --format=%H -- .env)
+    $history=@(git -c $gitSafe log --all --format=%H -- .env)
     if ($LASTEXITCODE -ne 0) { throw 'Cannot verify Git history' }
     Check ($history.Count -eq 0) 'no .env commits in accessible Git history'
     $user=docker compose exec -T web id -u
@@ -54,6 +55,6 @@ try {
     $dbInspect=docker inspect $dbId | ConvertFrom-Json
     $dataMount=$dbInspect[0].Mounts | Where-Object Destination -eq '/var/lib/mysql'
     Check ($dataMount.Name -eq 'attendance-phase1-fresh_phase1_data') 'database uses only new project volume'
-    Write-Output "Git root: $(git rev-parse --show-toplevel)"
+    Write-Output "Git root: $(git -c $gitSafe rev-parse --show-toplevel)"
     Write-Output "RESULT: $passed infrastructure/security assertions passed"
 } finally { Pop-Location }

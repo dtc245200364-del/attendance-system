@@ -2,7 +2,7 @@
 declare(strict_types=1);
 // Run inside the new web container only. Fixtures have a random unique prefix.
 require '/var/www/html/includes/db.php';
-$base='http://127.0.0.1:8080'; $cookie=''; $token=''; $passed=0;
+$base=getenv('TEST_BASE_URL') ?: 'http://127.0.0.1:8080'; $cookie=''; $token=''; $passed=0;
 $prefix='T'.bin2hex(random_bytes(5)); $classIds=[]; $studentIds=[];
 function check(bool $ok,string $label): void { global $passed; if (!$ok) throw new RuntimeException('FAIL: '.$label); echo 'PASS: '.$label."\n"; $passed++; }
 function http(string $path,?array $data=null): array {

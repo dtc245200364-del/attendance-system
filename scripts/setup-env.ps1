@@ -8,6 +8,6 @@ function New-Secret {
     try { $rng.GetBytes($bytes) } finally { $rng.Dispose() }
     return ([BitConverter]::ToString($bytes)).Replace('-', '').ToLowerInvariant()
 }
-$content = "WEB_PORT=18085`nPMA_PORT=18086`nDB_PASSWORD=$(New-Secret)`nDB_ROOT_PASSWORD=$(New-Secret)`n"
+$content = "PMA_PORT=18086`nDB_PASSWORD=$(New-Secret)`nDB_ROOT_PASSWORD=$(New-Secret)`n"
 [System.IO.File]::WriteAllText($target, $content, (New-Object System.Text.UTF8Encoding($false)))
 Write-Host 'Created .env with two independent random passwords. Keep this file private.'
