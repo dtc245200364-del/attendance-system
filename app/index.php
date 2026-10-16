@@ -1,0 +1,8 @@
+<?php
+require __DIR__ . '/includes/bootstrap.php';
+$counts=query('SELECT (SELECT COUNT(*) FROM classes) AS classes, (SELECT COUNT(*) FROM students WHERE active=1) AS students, (SELECT COUNT(*) FROM sessions) AS sessions, (SELECT COUNT(*) FROM attendance WHERE status="unmarked") AS pending')->fetch();
+page_start('Tổng quan','index.php');
+?>
+<section class="hero"><div><p class="eyebrow">MỖI BUỔI HỌC ĐỀU QUAN TRỌNG</p><h2>Điểm danh gọn gàng.<br>Theo dõi dễ dàng.</h2><p>Quản lý lớp học, ghi nhận chuyên cần và theo dõi hành trình học tập tại một nơi.</p><a class="button" href="/attendance.php">Bắt đầu điểm danh →</a></div><div class="hero-symbol" aria-hidden="true">✓</div></section>
+<section class="metrics"><?php foreach (['classes'=>'Lớp học','students'=>'Sinh viên đang học','sessions'=>'Buổi điểm danh','pending'=>'Lượt chưa điểm danh'] as $key=>$label): ?><article class="metric"><span><?= e($label) ?></span><strong><?= e($counts[$key]) ?></strong></article><?php endforeach; ?></section>
+<section class="panel"><h2>Buổi học gần đây</h2><div class="table-scroll"><table><thead><tr><th>Lớp</th><th>Buổi học</th><th>Thời gian</th><th></th></tr></thead><tbody><?php $rows=query('SELECT s.*,c.code FROM sessions s JOIN classes c ON c.id=s.class_id ORDER BY s.starts_at DESC,s.id DESC LIMIT 8')->fetchAll(); if (!$rows) echo '<tr><td colspan="4" class="empty">Chưa có buổi học. Bắt đầu bằng việc tạo lớp và thêm sinh viên.</td></tr>'; foreach ($rows as $s): ?><tr><td><span class="badge"><?= e($s['code']) ?></span></td><td><?= e($s['title']) ?></td><td><?= e(date('d/m/Y H:i',strtotime($s['starts_at']))) ?></td><td><a href="/attendance.php?session_id=<?= e($s['id']) ?>">Điểm danh →</a></td></tr><?php endforeach; ?></tbody></table></div></section><?php page_end(); ?>

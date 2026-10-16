@@ -1,0 +1,3 @@
+@import url('/assets/base.css');
+.table-scroll table{min-width:640px}
+.table-scroll td:nth-child(2){min-width:160px}

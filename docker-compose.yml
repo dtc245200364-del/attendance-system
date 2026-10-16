@@ -1,0 +1,56 @@
+name: attendance-phase1-fresh
+services:
+  web:
+    build: .
+    ports:
+      - "127.0.0.1:${WEB_PORT:-18085}:8080"
+    environment:
+      DB_HOST: db
+      DB_NAME: attendance_phase1
+      DB_USER: attendance_app
+      DB_PASSWORD: ${DB_PASSWORD:?Create .env first}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [frontend, database]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    restart: unless-stopped
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: attendance_phase1
+      MYSQL_USER: attendance_app
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Create .env first}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Create .env first}
+    volumes:
+      - phase1_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+      - ./database/permissions.sql:/docker-entrypoint-initdb.d/002-permissions.sql:ro
+      - ./database/consistency.sql:/docker-entrypoint-initdb.d/003-consistency.sql:ro
+    networks: [database]
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$$MYSQL_PASSWORD" mysql -h 127.0.0.1 -u "$$MYSQL_USER" "$$MYSQL_DATABASE" -e "SELECT 1"']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    restart: unless-stopped
+  phpmyadmin:
+    image: phpmyadmin:5.2-apache
+    ports:
+      - "127.0.0.1:${PMA_PORT:-18086}:80"
+    environment:
+      PMA_HOST: db
+      PMA_ARBITRARY: 0
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [frontend, database]
+    restart: unless-stopped
+networks:
+  frontend:
+  database:
+    internal: true
+volumes:
+  phase1_data:
