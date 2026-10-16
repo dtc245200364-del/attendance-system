@@ -1,3 +1,4 @@
+param([string]$ResultPath='docs/phase4-test-results.json')
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
 Push-Location $root
@@ -42,7 +43,11 @@ try {
         $item=(docker inspect (docker compose ps -q $service) | ConvertFrom-Json)[0]
         Check (@($logMounts | Where-Object { $_.Source -eq $item.LogPath -and $_.Destination -eq "/logs/$service/container-json.log" }).Count -eq 1) "log-file mount matches live $service container (no metadata directory)"
     }
-    docker compose exec -T grafana sh -c 'wget -qO- http://loki:3100/ready'
+    for ($attempt=0;$attempt -lt 12;$attempt++) {
+        docker compose exec -T grafana sh -c 'wget -qO- http://loki:3100/ready'
+        if ($LASTEXITCODE -eq 0) { break }
+        Start-Sleep -Seconds 2
+    }
     Check ($LASTEXITCODE -eq 0) 'Loki /ready returns 200 from internal network'
     for ($attempt=0;$attempt -lt 12;$attempt++) {
         docker compose exec -T promtail /usr/bin/bash /etc/promtail/healthcheck.sh
@@ -90,7 +95,7 @@ try {
     Check ($php.data.result.Count -gt 0) 'new PHP application event delivered to Loki, exact request ID'
     $warning=LogQuery ('{job="attendance",service="php",level="warn",status="403"} |= "'+$deniedId+'"')
     Check ($warning.data.result.Count -gt 0) 'PHP warning/status labels filter the actual CSRF rejection'
-    docker compose cp tests/logging-exception.php web:/tmp/attendance-logging-exception.php
+    & "$PSScriptRoot/copy-web-test.ps1" -Source tests/logging-exception.php -Name attendance-logging-exception.php
     if ($LASTEXITCODE -ne 0) { throw 'Exception test copy failed' }
     $exceptionOutput=(docker compose exec -T web sh -c 'php /tmp/attendance-logging-exception.php 2>&1') -join "`n"
     Check ($exceptionOutput.Contains('"event":"unhandled_exception"') -and !$exceptionOutput.Contains('PHASE4_PRIVATE_EXCEPTION_CANARY') -and !$exceptionOutput.Contains('Stack trace')) 'CLI exception logger omits message and stack trace'
@@ -128,7 +133,7 @@ try {
     $configText=Get-Content loki/config.yml -Raw
     Check ($configText -match 'retention_period: 168h' -and $configText -match 'retention_enabled: true' -and $configText -match 'delete_request_store: filesystem' -and $configText -match 'period: 24h') 'seven-day compactor retention configured (elapsed deletion not tested)'
     $output=@{checkedAt=[DateTimeOffset]::Now.ToString('o');passed=$script:passed;failed=$script:failed;checks=$script:checks;queries=$queries;proofRequestId=$proofId;phpRequestId=$phpId;sampledLines=$lines.Count;services=$services;collector='Promtail 3.5.12 (EOL; exam requirement)'}
-    [IO.File]::WriteAllText((Join-Path $root 'docs/phase4-test-results.json'),($output | ConvertTo-Json -Depth 15),(New-Object Text.UTF8Encoding($false)))
+    [IO.File]::WriteAllText((Join-Path $root $ResultPath),($output | ConvertTo-Json -Depth 15),(New-Object Text.UTF8Encoding($false)))
     Write-Output "RESULT: $script:passed logging assertions passed; $script:failed failed"
     if ($script:failed) { exit 1 }
 } finally { Pop-Location }

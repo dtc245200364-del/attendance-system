@@ -1,0 +1,225 @@
+{
+    "checks":  [
+                   {
+                       "pass":  true,
+                       "name":  "Compose config valid"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "loki running without OOM/restart"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "loki no privileged; all capabilities dropped"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "loki no published host ports"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "loki isolated on internal monitoring network"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "loki bounded CPU and memory"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "loki read-only root filesystem"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "promtail running without OOM/restart"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "promtail no privileged; all capabilities dropped"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "promtail no published host ports"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "promtail isolated on internal monitoring network"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "promtail bounded CPU and memory"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "promtail read-only root filesystem"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Loki non-root UID 10001"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Loki durable named volume"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Promtail durable positions volume"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "exactly three read-only log file mounts"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Promtail no socket or broad host directory mounts"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "log-file mount matches live nginx container (no metadata directory)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "log-file mount matches live web container (no metadata directory)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "log-file mount matches live db container (no metadata directory)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Loki /ready returns 200 from internal network"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Promtail /ready returns 200"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Grafana Loki datasource healthy"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "default Prometheus datasource preserved"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "existing nine-panel metrics dashboard preserved"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "four-panel log dashboard provisioned"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "service and level filters provisioned"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "real PHP request; edge overwrites caller request ID"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "controlled real HTTP 404 with request correlation ID"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "real invalid-CSRF request returns 403"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "new Nginx 404 delivered to Loki, exact request ID"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "new PHP application event delivered to Loki, exact request ID"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PHP warning/status labels filter the actual CSRF rejection"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "CLI exception logger omits message and stack trace"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "LogQL returns real data: {job=\"attendance\",service=\"nginx\"}"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "LogQL returns real data: {job=\"attendance\",service=\"nginx\"} | json | status = 404"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "LogQL returns real data: sum by (service) (count_over_time({job=\"attendance\"}[5m]))"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "404 LogQL result contains the controlled request"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "sanitized actual MySQL server events collected"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "query/cookie/forged-ID privacy canary absent from collected logs"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "all sampled log lines are JSON with only approved fields"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "only attendance nginx/php/mysql logs stored"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Grafana panel query returns real values: Service logs"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Grafana panel query returns real values: Nginx HTTP 404"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Grafana panel query returns real values: PHP application logs"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Grafana panel query returns real values: Log entries per service (rolling 5 minutes)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "seven-day compactor retention configured (elapsed deletion not tested)"
+                   }
+               ],
+    "checkedAt":  "2026-10-16T21:20:22.0730286+07:00",
+    "queries":  [
+                    {
+                        "query":  "{job=\"attendance\",service=\"nginx\"}",
+                        "resultType":  "streams",
+                        "series":  6
+                    },
+                    {
+                        "query":  "{job=\"attendance\",service=\"nginx\"} | json | status = 404",
+                        "resultType":  "streams",
+                        "series":  3
+                    },
+                    {
+                        "query":  "sum by (service) (count_over_time({job=\"attendance\"}[5m]))",
+                        "resultType":  "vector",
+                        "series":  2
+                    }
+                ],
+    "passed":  48,
+    "services":  [
+                     "mysql",
+                     "nginx",
+                     "php"
+                 ],
+    "collector":  "Promtail 3.5.12 (EOL; exam requirement)",
+    "phpRequestId":  "80c9763b56ce20924a1269c58d9503e4",
+    "failed":  0,
+    "proofRequestId":  "af572e25cabb934cfc0b2ca928f0b312",
+    "sampledLines":  782
+}

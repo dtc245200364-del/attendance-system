@@ -11,7 +11,7 @@ try {
     Check ((Status 'http://127.0.0.1:18087/stub_status') -eq 404) 'Nginx status not exposed through public website listener'
     $page=Invoke-WebRequest -UseBasicParsing http://127.0.0.1:18087/
     Check ($page.Headers['X-Frame-Options'] -eq 'DENY' -and $page.Headers['X-Content-Type-Options'] -eq 'nosniff' -and $page.Headers['Content-Security-Policy']) 'website security headers preserved'
-    docker compose cp tests/monitoring-access.php web:/tmp/attendance-monitoring-access.php
+    & "$PSScriptRoot/copy-web-test.ps1" -Source tests/monitoring-access.php -Name attendance-monitoring-access.php
     if ($LASTEXITCODE -ne 0) { throw 'Test copy failed' }
     docker compose exec -T web php /tmp/attendance-monitoring-access.php
     Check ($LASTEXITCODE -eq 0) 'Nginx status ACL rejects non-exporter proxy peer'

@@ -14,6 +14,7 @@ services:
     tmpfs: ['/tmp:rw,noexec,nosuid,size=8m']
     mem_limit: 128m
     cpus: 0.25
+    pids_limit: 64
     healthcheck:
       test: [CMD, /usr/bin/bash, /etc/promtail/healthcheck.sh]
       interval: 10s
@@ -35,6 +36,7 @@ services:
     tmpfs: ['/tmp:rw,noexec,nosuid,size=16m']
     mem_limit: 512m
     cpus: 0.5
+    pids_limit: 128
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     restart: unless-stopped
@@ -46,6 +48,11 @@ services:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     networks: [monitoring, observability_ui]
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,size=16m']
+    mem_limit: 512m
+    cpus: 0.5
+    pids_limit: 128
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     restart: unless-stopped
@@ -64,6 +71,11 @@ services:
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
     networks: [monitoring, observability_ui]
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,size=32m']
+    mem_limit: 512m
+    cpus: 0.5
+    pids_limit: 128
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     restart: unless-stopped
@@ -71,24 +83,34 @@ services:
     image: ghcr.io/google/cadvisor:0.55.1
     command:
       - --docker_only=true
-      - --containerd=/rootfs/run/containerd/containerd.sock
+      - --containerd=/run/containerd/containerd.sock
       - --housekeeping_interval=10s
       - --store_container_labels=false
       - --whitelisted_container_labels=com.docker.compose.project,com.docker.compose.service
       - --disable_metrics=percpu,sched,tcp,udp,hugetlb,referenced_memory,resctrl,process,disk
     cgroup: host
     volumes:
-      - /:/rootfs:ro
+      # Only host proc/cgroups and runtime sockets; no complete VM filesystem.
+      - /proc:/rootfs/proc:ro
       - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
+      - /run/containerd/containerd.sock:/run/containerd/containerd.sock:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks: [monitoring]
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,size=16m']
+    mem_limit: 256m
+    cpus: 0.5
+    pids_limit: 128
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     restart: unless-stopped
   nginx-exporter:
     image: nginx/nginx-prometheus-exporter:1.5.1
     command: [--nginx.scrape-uri=http://nginx:9091/stub_status]
+    read_only: true
+    mem_limit: 64m
+    cpus: 0.25
+    pids_limit: 64
     networks:
       monitoring:
       proxy:
@@ -109,6 +131,10 @@ services:
     volumes:
       - ./secrets/mysql-exporter.cnf:/run/secrets/mysql-exporter.cnf:ro
     networks: [monitoring, database]
+    read_only: true
+    mem_limit: 64m
+    cpus: 0.25
+    pids_limit: 64
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     restart: unless-stopped
@@ -126,6 +152,9 @@ services:
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=32m
     read_only: true
+    mem_limit: 128m
+    cpus: 0.5
+    pids_limit: 64
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     depends_on:
@@ -144,6 +173,14 @@ services:
     restart: unless-stopped
   web:
     build: .
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m,uid=33,gid=33,mode=1777
+      - /var/run/apache2:rw,noexec,nosuid,size=1m,uid=33,gid=33,mode=0755
+      - /var/lock/apache2:rw,noexec,nosuid,size=1m,uid=33,gid=33,mode=0755
+    mem_limit: 512m
+    cpus: 1.0
+    pids_limit: 256
     environment:
       DB_HOST: db
       DB_NAME: attendance_phase1

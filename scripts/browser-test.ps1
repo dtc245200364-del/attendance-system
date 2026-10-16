@@ -49,7 +49,7 @@ function Screenshot($name) {
     [IO.File]::WriteAllBytes((Join-Path $evidence $name),[Convert]::FromBase64String($shot.data))
 }
 try {
-    docker compose cp tests/browser-fixture.php web:/tmp/attendance-browser-fixture.php
+    & "$PSScriptRoot/copy-web-test.ps1" -Source tests/browser-fixture.php -Name attendance-browser-fixture.php
     if ($LASTEXITCODE -ne 0) { throw 'Fixture copy failed' }
     $fixture=docker compose exec -T web php /tmp/attendance-browser-fixture.php create $prefix | ConvertFrom-Json
     if ($LASTEXITCODE -ne 0) { throw 'Fixture creation failed' }

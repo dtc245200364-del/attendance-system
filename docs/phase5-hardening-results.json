@@ -1,0 +1,532 @@
+{
+    "passed":  100,
+    "candidateFilesScanned":  118,
+    "failed":  0,
+    "externalStartTimeChanges":  1,
+    "checks":  [
+                   {
+                       "pass":  true,
+                       "name":  "Compose configuration valid"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "read-only root filesystem: cadvisor"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "capabilities dropped, no privilege escalation: cadvisor"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "CPU/RAM/PID limits active: cadvisor"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "actual non-root process: db (UID 999/GID 999)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "actual non-root process: grafana (UID 472/GID 0)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "read-only root filesystem: grafana"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "capabilities dropped, no privilege escalation: grafana"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "CPU/RAM/PID limits active: grafana"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "actual non-root process: loki (UID 10001/GID 10001)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "read-only root filesystem: loki"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "capabilities dropped, no privilege escalation: loki"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "CPU/RAM/PID limits active: loki"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "actual non-root process: mysql-exporter (UID 65534/GID 65534)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "read-only root filesystem: mysql-exporter"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "capabilities dropped, no privilege escalation: mysql-exporter"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "CPU/RAM/PID limits active: mysql-exporter"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "actual non-root process: nginx (UID 101/GID 101)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "read-only root filesystem: nginx"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "capabilities dropped, no privilege escalation: nginx"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "CPU/RAM/PID limits active: nginx"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "actual non-root process: nginx-exporter (UID 1001/GID 1001)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "read-only root filesystem: nginx-exporter"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "capabilities dropped, no privilege escalation: nginx-exporter"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "CPU/RAM/PID limits active: nginx-exporter"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "actual non-root process: prometheus (UID 65534/GID 65534)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "read-only root filesystem: prometheus"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "capabilities dropped, no privilege escalation: prometheus"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "CPU/RAM/PID limits active: prometheus"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "read-only root filesystem: promtail"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "capabilities dropped, no privilege escalation: promtail"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "CPU/RAM/PID limits active: promtail"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "actual non-root process: web (UID 33/GID 33)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "read-only root filesystem: web"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "capabilities dropped, no privilege escalation: web"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "CPU/RAM/PID limits active: web"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PHP kernel CapEff zero and NoNewPrivs one"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "bounded noexec/nosuid tmpfs for PHP: /tmp"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "bounded noexec/nosuid tmpfs for PHP: /var/run/apache2"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "bounded noexec/nosuid tmpfs for PHP: /var/lock/apache2"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PHP CLI real/effective UID 33"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "write-open denied: /var/www/html/includes/bootstrap.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "write-open denied: /etc/passwd"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "temporary writes work"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PHP display_errors disabled"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PHP expose_php disabled"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "PHP session security settings"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "app has schema-scoped DML grants only"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "app cannot read mysql.user (1142)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "app database connection works"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "monitor user USAGE only"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "monitor can read global status"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "monitor cannot read student data (1142)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "monitor cannot read mysql.user (1142)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "monitor max connections = 3 (read-only mysql.user metadata query)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no published host port: web"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no published host port: db"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no published host port: cadvisor"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no published host port: nginx-exporter"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no published host port: mysql-exporter"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no published host port: loki"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no published host port: promtail"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "original loopback-only port: nginx"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "original loopback-only port: phpmyadmin"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "original loopback-only port: prometheus"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "original loopback-only port: grafana"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "internal network: proxy"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "internal network: database"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "internal network: monitoring"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "actual TCP connection Nginx to MySQL IP:3306 blocked"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "cAdvisor only four allowlisted read-only mounts; no VM root/docker-data mount"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "cAdvisor direct full-host filesystem paths absent"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Promtail exactly three read-only log files, no container metadata"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Promtail no runtime socket mounts"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "HTTP nosniff: http://127.0.0.1:18087/"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "HTTP frame denial: http://127.0.0.1:18087/"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "HTTP referrer policy: http://127.0.0.1:18087/"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "HTTP CSP: http://127.0.0.1:18087/"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no version/PHP disclosure: http://127.0.0.1:18087/"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "HTTP nosniff: http://127.0.0.1:18087/assets/style.css"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "HTTP frame denial: http://127.0.0.1:18087/assets/style.css"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "HTTP referrer policy: http://127.0.0.1:18087/assets/style.css"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "HTTP CSP: http://127.0.0.1:18087/assets/style.css"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no version/PHP disclosure: http://127.0.0.1:18087/assets/style.css"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "HTTP nosniff: http://127.0.0.1:18087/phase5-not-found"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "HTTP frame denial: http://127.0.0.1:18087/phase5-not-found"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "HTTP referrer policy: http://127.0.0.1:18087/phase5-not-found"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "HTTP CSP: http://127.0.0.1:18087/phase5-not-found"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no version/PHP disclosure: http://127.0.0.1:18087/phase5-not-found"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "actual session cookie HttpOnly and SameSite Strict"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "risk recorded: website accessible without login on local loopback"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "four independent 256-bit generated secret values (not printed)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local secret files unchanged"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "secret/env/runtime/log/temp paths ignored"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "candidate Git files free of actual local passwords and recognizable key/token formats"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Prometheus 4/4 targets UP"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "MySQL/phpMyAdmin container IDs, start times and states unchanged"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "all pre-existing other-project container IDs still exist"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "11 services running; configured healthchecks healthy; no OOM"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "all four MySQL table counts/SHA256 match before and after hardening/regression"
+                   }
+               ],
+    "runtime":  [
+                    {
+                        "health":  "healthy",
+                        "gid":  0,
+                        "memoryBytes":  268435456,
+                        "nanoCpus":  500000000,
+                        "running":  true,
+                        "pidsLimit":  128,
+                        "service":  "cadvisor",
+                        "uid":  0,
+                        "readOnly":  true
+                    },
+                    {
+                        "health":  "healthy",
+                        "gid":  999,
+                        "memoryBytes":  0,
+                        "nanoCpus":  0,
+                        "running":  true,
+                        "pidsLimit":  null,
+                        "service":  "db",
+                        "uid":  999,
+                        "readOnly":  false
+                    },
+                    {
+                        "health":  null,
+                        "gid":  0,
+                        "memoryBytes":  536870912,
+                        "nanoCpus":  500000000,
+                        "running":  true,
+                        "pidsLimit":  128,
+                        "service":  "grafana",
+                        "uid":  472,
+                        "readOnly":  true
+                    },
+                    {
+                        "health":  null,
+                        "gid":  10001,
+                        "memoryBytes":  536870912,
+                        "nanoCpus":  500000000,
+                        "running":  true,
+                        "pidsLimit":  128,
+                        "service":  "loki",
+                        "uid":  10001,
+                        "readOnly":  true
+                    },
+                    {
+                        "health":  null,
+                        "gid":  65534,
+                        "memoryBytes":  67108864,
+                        "nanoCpus":  250000000,
+                        "running":  true,
+                        "pidsLimit":  64,
+                        "service":  "mysql-exporter",
+                        "uid":  65534,
+                        "readOnly":  true
+                    },
+                    {
+                        "health":  "healthy",
+                        "gid":  101,
+                        "memoryBytes":  134217728,
+                        "nanoCpus":  500000000,
+                        "running":  true,
+                        "pidsLimit":  64,
+                        "service":  "nginx",
+                        "uid":  101,
+                        "readOnly":  true
+                    },
+                    {
+                        "health":  null,
+                        "gid":  1001,
+                        "memoryBytes":  67108864,
+                        "nanoCpus":  250000000,
+                        "running":  true,
+                        "pidsLimit":  64,
+                        "service":  "nginx-exporter",
+                        "uid":  1001,
+                        "readOnly":  true
+                    },
+                    {
+                        "health":  null,
+                        "gid":  0,
+                        "memoryBytes":  0,
+                        "nanoCpus":  0,
+                        "running":  true,
+                        "pidsLimit":  null,
+                        "service":  "phpmyadmin",
+                        "uid":  0,
+                        "readOnly":  false
+                    },
+                    {
+                        "health":  null,
+                        "gid":  65534,
+                        "memoryBytes":  536870912,
+                        "nanoCpus":  500000000,
+                        "running":  true,
+                        "pidsLimit":  128,
+                        "service":  "prometheus",
+                        "uid":  65534,
+                        "readOnly":  true
+                    },
+                    {
+                        "health":  "healthy",
+                        "gid":  0,
+                        "memoryBytes":  134217728,
+                        "nanoCpus":  250000000,
+                        "running":  true,
+                        "pidsLimit":  64,
+                        "service":  "promtail",
+                        "uid":  0,
+                        "readOnly":  true
+                    },
+                    {
+                        "health":  "healthy",
+                        "gid":  33,
+                        "memoryBytes":  536870912,
+                        "nanoCpus":  1000000000,
+                        "running":  true,
+                        "pidsLimit":  256,
+                        "service":  "web",
+                        "uid":  33,
+                        "readOnly":  true
+                    }
+                ],
+    "checkedAt":  "2026-10-16T21:20:36.4032100+07:00"
+}

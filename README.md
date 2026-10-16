@@ -1,6 +1,6 @@
 # Hệ thống điểm danh sinh viên — Đề 27
 
-Triển khai **Giai đoạn 1–3** bằng PHP 8.3, PDO, MySQL 8.4, phpMyAdmin, Docker Compose, Nginx và Prometheus/Grafana. Mã nguồn được viết mới từ các file khung rỗng trong workspace; không lấy mã từ container điểm danh cũ.
+Triển khai **Giai đoạn 1–5** bằng PHP 8.3, PDO, MySQL 8.4, phpMyAdmin, Docker Compose, Nginx, Prometheus/Grafana và Loki/Promtail, kèm hardening đã kiểm chứng. Mã nguồn được viết mới từ các file khung rỗng trong workspace; không lấy mã từ container điểm danh cũ.
 
 ## Khởi chạy trên Windows
 
@@ -15,7 +15,7 @@ docker compose up -d db
 # Chờ db healthy, rồi khởi chạy backend trước Nginx:
 docker compose up -d --build web phpmyadmin
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-monitoring.ps1
-docker compose up -d --build
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-logging.ps1
 docker compose ps
 ```
 
@@ -229,4 +229,41 @@ Trong Grafana → Explore → datasource **Loki**, dùng:
 sum by (service) (count_over_time({job="attendance"}[5m]))
 ```
 
-Tạo 404 mới tại http://127.0.0.1:18087/phase4-log-proof; chọn Last 15 minutes và Refresh. Log MySQL chủ yếu phát sinh lúc khởi động: tăng khoảng thời gian nếu chưa thấy, không restart DB để tạo log. Xem [biên bản nghiệm thu](docs/phase4-validation.md) và [hướng dẫn tự chụp minh chứng thật](docs/phase4-screenshots.md). Chưa commit/push Giai đoạn 4.
+Tạo 404 mới tại http://127.0.0.1:18087/phase4-log-proof; chọn Last 15 minutes và Refresh. Log MySQL chủ yếu phát sinh lúc khởi động: tăng khoảng thời gian nếu chưa thấy, không restart DB để tạo log. Xem [biên bản nghiệm thu](docs/phase4-validation.md) và [hướng dẫn tự chụp minh chứng thật](docs/phase4-screenshots.md). Giai đoạn 4 đã commit/push tại `76be11e`.
+
+## Giai đoạn 5 — Hardening
+
+Giữ nguyên nghiệp vụ, giao diện và bốn cổng loopback hiện tại. PHP vẫn UID/GID 33; MySQL daemon hiện UID/GID 999 theo image, không ép user/khởi động lại DB. Chín service ứng dụng/observability có root filesystem read-only, `cap_drop: ALL`, `no-new-privileges`, giới hạn CPU/RAM/PID. Các volume ghi dữ liệu Prometheus/Grafana/Loki/positions giữ nguyên; PHP chỉ ghi tmpfs `/tmp`, `/var/run/apache2`, `/var/lock/apache2` với UID 33, noexec/nosuid và giới hạn dung lượng. Session PHP trong tmpfs mất khi recreate container; đây không phải dữ liệu MySQL.
+
+| Nhóm đã kiểm chứng | Cấu hình và phép thử thực tế |
+|---|---|
+| Non-root/quyền container | Docker top UID/GID, `/proc/1/status` PHP CapEff=0 và NoNewPrivs=1; mở mã nguồn để ghi bị từ chối, ghi tạm thành công |
+| Network isolation | Proxy/database/monitoring internal; chỉ Nginx publish website; không publish backend/DB; TCP Nginx → IP DB:3306 bị chặn |
+| Secrets/quyền DB | Bốn mật khẩu khác nhau sinh ngẫu nhiên 256-bit, ignored; app chỉ DML trong schema, monitor USAGE và tối đa 3 connection, SELECT dữ liệu sinh viên bị từ chối |
+| HTTP headers/session | CSP, DENY, nosniff, same-origin trên HTML/CSS/404; ẩn phiên bản/PHP banner; cookie HttpOnly và SameSite Strict |
+| Filesystem/tài nguyên/mount | Chín service read-only và CPU/RAM/PID limits; cAdvisor bỏ mount toàn VM và Docker data, Promtail chỉ đọc ba file log |
+
+cAdvisor giờ chỉ mount `/proc:/rootfs/proc:ro`, `/sys:/sys:ro` và đúng hai Docker/containerd sockets `:ro`, không mount `/:/rootfs` hoặc `/var/lib/docker`. CPU/RAM/network phải được kiểm tra lại sau thay đổi này. **Socket `:ro` không hạn chế quyền API**; cAdvisor vẫn là thành phần nhạy cảm chạy root, cần mạng nội bộ và trusted operator. Promtail root cần đọc file root-owned, không có runtime socket. Không mở rộng privileged/capabilities. Không đổi MySQL/phpMyAdmin chỉ để đạt số lượng biện pháp.
+
+Áp dụng trên stack đang chạy sẽ recreate riêng các service dưới đây, gián đoạn ngắn website/monitoring; không recreate DB/phpMyAdmin. Không cần build lại PHP vì chỉ đổi Compose và test scripts:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/data-fingerprint.ps1 -OutputPath docs/phase5-data-before.json
+docker compose config --quiet
+docker compose up -d --no-deps web nginx prometheus grafana cadvisor nginx-exporter mysql-exporter loki
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-logging.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/monitoring-test.ps1 -ResultPath docs/phase5-monitoring-results.json
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/logging-test.ps1 -ResultPath docs/phase5-logging-results.json
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/monitoring-access-test.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/acceptance-check.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/data-fingerprint.ps1 -OutputPath docs/phase5-data-after.json
+# Audit theo phiên làm việc cần inventory/hash baseline cục bộ trong secrets/:
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/hardening-test.ps1
+```
+
+`copy-web-test.ps1` truyền file test bằng Base64 ASCII vào tmpfs dưới UID 33 và kiểm SHA256 nguyên byte, vì Docker cp không dùng được với container read-only. Không tạo debug endpoint. `hardening-test.ps1` dùng inventory `secrets/phase5-runtime-before.json` và hash `secrets/phase5-secret-hashes.json` đã lưu cục bộ trước audit; các baseline này không vào Git. Nếu chuyển máy, dùng lệnh kiểm tra/quy trình trong [biên bản](docs/phase5-validation.md), không sao chép secrets từ máy cũ.
+
+Ứng dụng hiện **chưa có đăng nhập/phân quyền người dùng**; CSRF không thay thế xác thực. Chỉ dùng demo trên máy tin cậy với loopback, không public/tunnel hoặc dữ liệu sinh viên thật. Đề xuất giai đoạn riêng thêm login, role giảng viên/quản trị và authorization từng thao tác; chưa tự thay đổi ứng dụng trong giai đoạn này. Promtail EOL, quyền sockets và giới hạn retention vẫn như biên bản Giai đoạn 4.
+
+Xem [nghiệm thu hardening](docs/phase5-validation.md) và [hướng dẫn tự chụp ảnh thật](docs/phase5-screenshots.md). Chưa commit/push Giai đoạn 5.

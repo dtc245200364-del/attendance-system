@@ -2,7 +2,7 @@ param([Parameter(Mandatory=$true)][string]$OutputPath)
 $ErrorActionPreference='Stop'
 Push-Location (Split-Path $PSScriptRoot -Parent)
 try {
-    docker compose cp tests/data-fingerprint.php web:/tmp/attendance-fingerprint.php
+    & "$PSScriptRoot/copy-web-test.ps1" -Source tests/data-fingerprint.php -Name attendance-fingerprint.php
     if ($LASTEXITCODE -ne 0) { throw 'Cannot copy data fingerprint tool' }
     $json=docker compose exec -T web php /tmp/attendance-fingerprint.php
     if ($LASTEXITCODE -ne 0) { throw 'Data fingerprint command failed' }

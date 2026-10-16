@@ -1,0 +1,16 @@
+# Hướng dẫn tự chụp minh chứng thật — Hardening
+
+Tự chụp màn hình trên máy đang chạy sau khi kiểm tra trạng thái. Không có ảnh AI, không tạo ảnh PASS giả. Chưa lưu ảnh Giai đoạn 5 trong lượt triển khai. Nếu lưu ảnh, dùng `docs/evidence/phase5/`, kiểm tra che dữ liệu cá nhân và secrets trước khi đưa Git.
+
+1. **Tổng thể container:** Docker Desktop lọc project attendance; chụp 11 service đang running/healthy. Không mở mục environment hoặc full Inspect. `01-containers.png`.
+2. **Non-root/quyền kernel:** tại workspace, chạy `docker compose exec web id`, `docker compose exec nginx id`, `docker top $(docker compose ps -q db) -eo uid,gid,pid,comm`, `docker compose exec web sh -c 'cat /proc/1/status'`. Chụp UID/GID, CapEff và NoNewPrivs; không chụp environment. `02-non-root.png`.
+3. **Read-only và tài nguyên:** mở phần Compose chỉ của web, chụp read_only/tmpfs/resource/cap_drop/no-new-privileges. Chạy `scripts/hardening-test.ps1`, chụp dòng PASS từ chối mở source để ghi và tmpfile vẫn ghi được. Script không sửa source file. Không chạy `docker compose config` bản full có secrets. `03-filesystem.png`.
+4. **Network/ports:** chụp `docker compose ps` và các PASS của hardening test cho ports/network/TCP Nginx→DB blocked. Giữ rõ bốn cổng bind 127.0.0.1. `04-networks.png`.
+5. **Quyền DB/secrets:** chụp dòng PASS app schema DML-only, monitor USAGE/3 connections, denied student data/mysql.user và secret scan. Không mở `.env`, `.env.grafana`, `.cnf`, SQL chứa mật khẩu, auth headers hoặc full Docker inspect. `05-least-privilege.png`.
+6. **Headers/cookie:** trình duyệt mở http://127.0.0.1:18087/, DevTools → Network → request HTML → Response headers. Chụp CSP, DENY, nosniff, Referrer-Policy và Server không phiên bản. Nếu chụp cookie flags, che giá trị PHPSESSID; không chụp Request headers có Cookie. Lặp với `/phase5-not-found` nếu cần minh chứng 404 cũng có headers. `06-headers.png`.
+7. **Mount collector:** mở Compose phần cAdvisor, chụp bốn mount thu hẹp, read-only/cap-drop; chụp PASS Promtail ba file/no socket trong script. Không chụp generated override/raw log nếu chưa rà nội dung. `07-collector-mounts.png`.
+8. **Regression monitoring:** mở http://127.0.0.1:19090/targets chụp 4 UP; Grafana http://127.0.0.1:13001/d/attendance-system chụp đủ 9 panel. Đăng nhập trước, không chụp password. `08-targets.png`, `09-metrics.png`.
+9. **Regression logging:** tạo 404 thật http://127.0.0.1:18087/phase4-log-proof, mở http://127.0.0.1:13001/d/attendance-logs, chọn Last 15 minutes/Refresh. Explore → Loki chạy ba query trong biên bản; chụp query và kết quả thật, không chỉnh số liệu. `10-logs.png`, `11-logql.png`.
+10. **Kết quả và dữ liệu:** chụp RESULT từng bộ ở Terminal sau chạy thật theo README, cùng fingerprint trước/sau (chỉ count/hash, không raw student data). Không mô tả ảnh này chứng minh authentication đã có; biên bản ghi rõ website còn thiếu login/RBAC. `12-results.png`, `13-fingerprints.png`.
+
+Audit hardening cần baseline local ignored như hướng dẫn trong `phase5-validation.md`. Khi chạy lại trên máy hiện tại không ghi đè baseline cũ. Nếu phát sinh FAIL, chụp/ghi đúng lỗi và xử lý có kiểm soát trước khi kết luận PASS. Ảnh dashboard phải có log mới/khung thời gian phù hợp, không dùng ảnh giai đoạn trước làm minh chứng hardening mới.
