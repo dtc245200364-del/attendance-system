@@ -1,0 +1,18 @@
+﻿{
+    "classes": {
+        "count": 3,
+        "sha256": "5282e7210aa569bdf9f017826b1539f537b791c683a338eab6496042e6668f3c"
+    },
+    "students": {
+        "count": 3,
+        "sha256": "0c6da2f6efb760f8f7189b10847e32a21581b8182d230208f636cbcc5a9884f2"
+    },
+    "sessions": {
+        "count": 3,
+        "sha256": "88c2894c8a5874f2350aa7ff85b9a3db6485fd175081b1d7fb218fab632408c8"
+    },
+    "attendance": {
+        "count": 6,
+        "sha256": "6e8230aa3af08f8f5b002ef7cf93f59481ea5049ec016d505b2ce8e5776e5a12"
+    }
+}

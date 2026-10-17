@@ -1,4 +1,4 @@
-param([string]$ResultPath='docs/phase4-test-results.json')
+param([string]$ResultPath='docs/phase4-test-results.json', [ValidatePattern('^[1-9][0-9]*[smhd]$')][string]$MySqlLogLookback='2h')
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
 Push-Location $root
@@ -117,7 +117,7 @@ try {
     }
     $filtered=LogQuery ($notFoundExpr+' | request_id = "'+$proofId+'"')
     Check ($filtered.data.result.Count -gt 0) '404 LogQL result contains the controlled request'
-    $mysql=LogQuery '{job="attendance",service="mysql"}' $false '2h'
+    $mysql=LogQuery '{job="attendance",service="mysql"}' $false $MySqlLogLookback
     Check ($mysql.data.result.Count -gt 0) 'sanitized actual MySQL server events collected'
     $all=LogQuery '{job="attendance"}' $false '2h'
     $lines=@($all.data.result | ForEach-Object { $_.values | ForEach-Object { $_[1] } })
