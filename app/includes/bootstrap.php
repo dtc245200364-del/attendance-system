@@ -68,8 +68,8 @@ function post_action(callable $callback): void {
         page_end(); exit;
     }
     try {
-        $callback();
-        $_SESSION['flash'] = ['success', 'Đã lưu thay đổi.'];
+        $message = $callback();
+        $_SESSION['flash'] = ['success', is_string($message) ? $message : 'Đã lưu thay đổi.'];
         header('Location: ' . basename($_SERVER['SCRIPT_NAME'])); exit;
     } catch (FormConflict $ex) {
         if (db()->inTransaction()) db()->rollBack();
@@ -92,12 +92,44 @@ set_exception_handler(function (Throwable $ex): void {
 });
 function page_start(string $title, string $active): void {
     $links = ['index.php'=>'Tổng quan', 'classes.php'=>'Lớp học', 'students.php'=>'Sinh viên', 'attendance.php'=>'Điểm danh', 'history.php'=>'Lịch sử', 'statistics.php'=>'Thống kê'];
-    echo '<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' . e($title) . ' · Điểm danh</title><link rel="stylesheet" href="/assets/style.css"></head><body><aside><a class="brand" href="/">A<span>Attendance</span></a><p class="muted">QUẢN LÝ HỌC TẬP</p><nav>';
-    foreach ($links as $url=>$label) echo '<a ' . ($url === $active ? 'class="active" aria-current="page"' : '') . ' href="/' . $url . '">' . e($label) . '</a>';
-    echo '</nav><p class="sidebar-note">Hệ thống điểm danh<br>Giai đoạn 1 · PHP & MySQL</p></aside><main><header><div><p class="eyebrow">KHÔNG GIAN GIẢNG VIÊN</p><h1>' . e($title) . '</h1></div><span class="date">' . date('d/m/Y') . '</span></header>';
+    $icons = ['index.php'=>'grid','classes.php'=>'book','students.php'=>'users','attendance.php'=>'check','history.php'=>'clock','statistics.php'=>'chart'];
+    $descriptions = ['index.php'=>'Mọi thông tin cần thiết, trong một không gian.', 'classes.php'=>'Tổ chức lớp học, kết nối việc giảng dạy.', 'students.php'=>'Quản lý hồ sơ và hành trình học tập.', 'attendance.php'=>'Ghi nhận sự hiện diện, theo từng buổi học.', 'history.php'=>'Tra cứu rõ ràng. Theo dõi liền mạch.', 'statistics.php'=>'Nhìn lại chuyên cần qua những con số.'];
+    echo '<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' . e($title) . ' · Attendance</title><link rel="stylesheet" href="/assets/style.css"><script src="/assets/ui.js" defer></script></head><body><a class="skip-link" href="#main-content">Đến nội dung chính</a><aside class="sidebar"><a class="brand" href="/">' . ui_icon('cap') . '<span>Attendance<small>Không gian học tập</small></span></a><p class="nav-label">QUẢN LÝ ĐÀO TẠO</p><nav aria-label="Điều hướng chính">';
+    foreach ($links as $url=>$label) echo '<a ' . ($url === $active ? 'class="active" aria-current="page"' : '') . ' href="/' . $url . '">' . ui_icon($icons[$url]) . '<span>' . e($label) . '</span>' . ($url === $active ? '<span class="nav-dot" aria-hidden="true"></span>' : '') . '</a>';
+    echo '</nav><div class="sidebar-note">' . ui_icon('cap') . '<strong>Mỗi buổi học đều có ý nghĩa.</strong><p>Đồng hành cùng việc dạy và học mỗi ngày.</p></div><div class="sidebar-bottom"><span class="connection-dot" aria-hidden="true"></span> Quản lý điểm danh sinh viên</div></aside><main id="main-content" tabindex="-1"><div class="topbar"><span class="breadcrumb">Quản lý đào tạo <span aria-hidden="true">/</span> <strong>' . e($links[$active] ?? $title) . '</strong></span><span class="date">' . ui_icon('calendar') . '<time datetime="' . date('Y-m-d') . '">' . date('d/m/Y') . '</time></span></div><header class="page-header"><div><p class="eyebrow">KHÔNG GIAN GIẢNG VIÊN</p><h1>' . e($title) . '</h1><p class="page-description">' . e($descriptions[$active] ?? 'Quản lý điểm danh sinh viên') . '</p></div><span class="workspace-mark">' . ui_icon($icons[$active] ?? 'cap') . '</span></header>';
     if (isset($_SESSION['flash'])) { [$type,$message] = $_SESSION['flash']; unset($_SESSION['flash']); echo '<div role="status" class="alert ' . e($type) . '">' . e($message) . '</div>'; }
 }
-function page_end(): void { echo '<footer>Attendance System · Dữ liệu được lưu theo giờ Việt Nam (UTC+7)</footer></main></body></html>'; }
+function page_end(): void { echo '<footer><span><strong>Attendance</strong> · Quản lý học tập</span><span>Giờ Việt Nam · UTC+7</span></footer></main></body></html>'; }
+
+// Static, local SVG icons. No external font, library or user-provided markup.
+function ui_icon(string $name): string {
+    $paths = [
+        'cap'=>'<path d="m3 9 9-5 9 5-9 5-9-5Z"/><path d="M6 11v6c4 3 8 3 12 0v-6M21 9v7"/>',
+        'grid'=>'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
+        'book'=>'<path d="M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1v15Z"/>',
+        'users'=>'<circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6M18 15c2 0 3 2 3 4v2"/>',
+        'check'=>'<rect x="4" y="4" width="16" height="17" rx="3"/><path d="M9 3h6v4H9zM8 14l3 3 5-6"/>',
+        'clock'=>'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+        'chart'=>'<path d="M4 3v17h17M8 16v-4M13 16V8M18 16V5"/>',
+        'calendar'=>'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4M17 3v4M3 11h18M8 15h2M14 15h2"/>',
+        'arrow'=>'<path d="M5 12h14m-5-5 5 5-5 5"/>',
+        'plus'=>'<path d="M12 5v14M5 12h14"/>',
+        'search'=>'<circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/>',
+        'info'=>'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/>',
+        'edit'=>'<path d="m16 3 5 5-12 12-6 1 1-6L16 3ZM13 6l5 5"/>',
+        'archive'=>'<rect x="3" y="3" width="18" height="5" rx="1"/><path d="M5 8v12h14V8M10 12h4"/>',
+        'restore'=>'<path d="M3 10a9 9 0 1 1 2 8M3 4v6h6M12 8v5l3 2"/>',
+        'trash'=>'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/>',
+    ];
+    return '<svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . ($paths[$name] ?? $paths['grid']) . '</svg>';
+}
+function ui_metric(string $label, int $value, string $icon, string $tone = ''): void {
+    echo '<article class="metric ' . e($tone) . '"><div class="metric-top"><span>' . e($label) . '</span><span class="metric-icon">' . ui_icon($icon) . '</span></div><strong>' . e($value) . '</strong><small>' . ($value === 0 ? 'Chưa có lượt ghi nhận' : 'Dữ liệu hiện tại') . '</small></article>';
+}
+function ui_avatar(string $name): string {
+    preg_match('/\S/u', $name, $initial);
+    return '<span class="avatar" aria-hidden="true">' . e($initial[0] ?? '?') . '</span>';
+}
 function require_record(string $table, int $recordId): void {
     if (!in_array($table, ['classes', 'students'], true)) throw new LogicException('Invalid table');
     if (!query('SELECT id FROM ' . $table . ' WHERE id=?', [$recordId])->fetch()) throw new InvalidArgumentException('Không tìm thấy dữ liệu cần thay đổi.');

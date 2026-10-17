@@ -1,0 +1,715 @@
+{
+    "passed":  175,
+    "failed":  0,
+    "viewports":  [
+                      390,
+                      768,
+                      1366,
+                      1440,
+                      1920
+                  ],
+    "checks":  [
+                   {
+                       "pass":  true,
+                       "name":  "layout 390px /index.php (scroll=390, viewport=390)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 390px /index.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 390px /index.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 390px /index.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 390px /classes.php (scroll=390, viewport=390)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 390px /classes.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 390px /classes.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 390px /classes.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 390px /students.php (scroll=390, viewport=390)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 390px /students.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 390px /students.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 390px /students.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "three labeled actions with icons/tooltips 390px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "student actions fit viewport 390px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "populated edit form fits viewport 390px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "confirmation dialog fits viewport 390px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 390px /attendance.php?session_id=181 (scroll=390, viewport=390)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 390px /attendance.php?session_id=181"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 390px /attendance.php?session_id=181"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 390px /attendance.php?session_id=181"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 390px /history.php (scroll=390, viewport=390)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 390px /history.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 390px /history.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 390px /history.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 390px /statistics.php (scroll=390, viewport=390)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 390px /statistics.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 390px /statistics.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 390px /statistics.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "readable attendance name column 390px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "mobile attendance table scrolls to status controls"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 768px /index.php (scroll=753, viewport=768)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 768px /index.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 768px /index.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 768px /index.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 768px /classes.php (scroll=768, viewport=768)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 768px /classes.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 768px /classes.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 768px /classes.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 768px /students.php (scroll=753, viewport=768)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 768px /students.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 768px /students.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 768px /students.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "three labeled actions with icons/tooltips 768px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "student actions fit viewport 768px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "populated edit form fits viewport 768px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "confirmation dialog fits viewport 768px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 768px /attendance.php?session_id=181 (scroll=753, viewport=768)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 768px /attendance.php?session_id=181"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 768px /attendance.php?session_id=181"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 768px /attendance.php?session_id=181"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 768px /history.php (scroll=753, viewport=768)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 768px /history.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 768px /history.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 768px /history.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 768px /statistics.php (scroll=753, viewport=768)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 768px /statistics.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 768px /statistics.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 768px /statistics.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "readable attendance name column 768px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1366px /index.php (scroll=1351, viewport=1366)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1366px /index.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1366px /index.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1366px /index.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1366px /classes.php (scroll=1366, viewport=1366)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1366px /classes.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1366px /classes.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1366px /classes.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1366px /students.php (scroll=1366, viewport=1366)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1366px /students.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1366px /students.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1366px /students.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "three labeled actions with icons/tooltips 1366px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "student actions fit viewport 1366px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "populated edit form fits viewport 1366px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "confirmation dialog fits viewport 1366px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1366px /attendance.php?session_id=181 (scroll=1351, viewport=1366)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1366px /attendance.php?session_id=181"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1366px /attendance.php?session_id=181"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1366px /attendance.php?session_id=181"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1366px /history.php (scroll=1351, viewport=1366)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1366px /history.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1366px /history.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1366px /history.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1366px /statistics.php (scroll=1351, viewport=1366)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1366px /statistics.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1366px /statistics.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1366px /statistics.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "readable attendance name column 1366px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1440px /index.php (scroll=1425, viewport=1440)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1440px /index.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1440px /index.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1440px /index.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1440px /classes.php (scroll=1440, viewport=1440)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1440px /classes.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1440px /classes.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1440px /classes.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1440px /students.php (scroll=1440, viewport=1440)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1440px /students.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1440px /students.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1440px /students.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "three labeled actions with icons/tooltips 1440px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "student actions fit viewport 1440px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "populated edit form fits viewport 1440px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "confirmation dialog fits viewport 1440px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1440px /attendance.php?session_id=181 (scroll=1425, viewport=1440)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1440px /attendance.php?session_id=181"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1440px /attendance.php?session_id=181"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1440px /attendance.php?session_id=181"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1440px /history.php (scroll=1425, viewport=1440)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1440px /history.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1440px /history.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1440px /history.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1440px /statistics.php (scroll=1425, viewport=1440)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1440px /statistics.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1440px /statistics.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1440px /statistics.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "readable attendance name column 1440px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1920px /index.php (scroll=1905, viewport=1920)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1920px /index.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1920px /index.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1920px /index.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1920px /classes.php (scroll=1920, viewport=1920)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1920px /classes.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1920px /classes.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1920px /classes.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1920px /students.php (scroll=1920, viewport=1920)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1920px /students.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1920px /students.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1920px /students.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "three labeled actions with icons/tooltips 1920px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "student actions fit viewport 1920px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "populated edit form fits viewport 1920px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "confirmation dialog fits viewport 1920px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1920px /attendance.php?session_id=181 (scroll=1905, viewport=1920)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1920px /attendance.php?session_id=181"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1920px /attendance.php?session_id=181"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1920px /attendance.php?session_id=181"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1920px /history.php (scroll=1905, viewport=1920)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1920px /history.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1920px /history.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1920px /history.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "layout 1920px /statistics.php (scroll=1905, viewport=1920)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "six navigation links and active state 1920px /statistics.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "design tokens and sidebar 1920px /statistics.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "local assets 1920px /statistics.php"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "readable attendance name column 1920px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "student client search filters matching code"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "student search empty state"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "clearing search restores roster"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "student edit action accessible"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "edit button opens populated current profile"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "delete opens modal with student name and code"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "protected student cannot confirm delete in UI"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "confirmation initially focuses safe cancel action"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "cancel closes dialog without mutation"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "Escape cancels native dialog"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "archive action changes to restore with explicit success"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "restore action returns to archive"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "browser creates unreferenced test profile"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "unreferenced identity rendered as text and delete enabled"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "explicit modal confirmation deletes only new test profile"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "attendance status color follows selection"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "changing selection does not auto-save"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "CSRF version and completion fields preserved"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "JavaScript compiles: ui.js (without weakening CSP)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "JavaScript compiles: attendance.js (without weakening CSP)"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "CSS loaded and scroll area labeled"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "browser attendance form accepts three states"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "browser submit persists present/absent/late"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "browser required input validation"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "browser rejects invalid CSRF"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "CSRF error has visible alert and recovery link"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "browser validation error visible"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "browser empty filtered history visible"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no unhandled JavaScript exceptions"
+                   }
+               ],
+    "environment":  "isolated test stack",
+    "screenshots":  "automated QA only, not user acceptance evidence"
+}

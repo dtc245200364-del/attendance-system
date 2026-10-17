@@ -1,3 +1,179 @@
 @import url('/assets/base.css');
-.table-scroll table{min-width:640px}
-.table-scroll td:nth-child(2){min-width:160px}
+.table-scroll table{
+  min-width:640px
+}
+.table-scroll td:nth-child(2){
+  min-width:160px
+}
+.statistics-table{
+  min-width:820px!important
+}
+.attendance-select[data-status="present"]{
+  background:#f0faf5;
+  border-color:#b8ddcb;
+  color:#25694e
+}
+.attendance-select[data-status="absent"]{
+  background:#fff5f3;
+  border-color:#ecc6c0;
+  color:#a0473d
+}
+.attendance-select[data-status="late"]{
+  background:#fff9ec;
+  border-color:#ead6ac;
+  color:#8a641d
+}
+.attendance-select[data-status="unmarked"]{
+  background:#f7f9fc;
+  color:#62738b
+}
+.session-summary{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  padding:14px 16px;
+  border-radius:10px;
+  border:1px solid #dcebe4;
+  background:#f7fbf9;
+  margin-bottom:18px;
+  font-size:12px
+}
+.session-summary>span:last-child{
+  margin-left:auto;
+  color:#667c8e;
+  font-size:11px
+}
+.badge>.icon{
+  width:14px;
+  height:14px
+}
+.student summary>span{
+  min-width:0
+}
+.student summary>span:nth-child(3) .badge{
+  display:inline-block;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  vertical-align:middle
+}
+.distribution-row.absent meter::-moz-meter-bar{
+  background:#cc716a
+}
+.distribution-row.late meter::-moz-meter-bar{
+  background:#dfad57
+}
+.distribution-row.unmarked meter::-moz-meter-bar{
+  background:#98a7bc
+}
+
+/* Student actions are outside summary: no nested forms or interactive toggles. */
+.student-directory .student-head,.student-directory .student-row {
+  display:grid;
+  grid-template-columns:minmax(160px,1.4fr) minmax(90px,1fr) minmax(65px,.65fr) 105px minmax(290px,auto);
+  gap:12px;
+  align-items:center;
+  padding:16px;
+  min-width:0;
+}
+.student-directory {overflow:visible}
+.student-record {border-top:1px solid var(--line)}
+.student-record[hidden] {display:none}
+.student-row {font-size:12px}
+.student-row>span {min-width:0}
+.student-class .badge {display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+.student-cell-label {display:none}
+.student-actions {display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.student-actions form {margin:0}
+.student-actions .action-button {min-height:36px;padding:7px 9px;font-size:11px;gap:5px}
+.student-actions .icon {width:15px;height:15px}
+.student-directory .student {min-width:0;border:0}
+.student-directory .student:not([open])>summary {display:none}
+.student-directory .student>summary {display:block;min-width:0;padding:12px 20px;font-size:12px;background:#f2f8f5;border-top:1px solid var(--line)}
+.student-directory .student-body {border-top:1px solid var(--line)}
+.student-delete-dialog {width:min(480px,calc(100% - 32px));max-height:calc(100dvh - 32px);overflow-y:auto;padding:27px;border:1px solid var(--line);border-radius:18px;background:#fff;color:var(--text);box-shadow:0 24px 90px #102c3940}
+.student-delete-dialog::backdrop {background:#142b3b88;backdrop-filter:blur(3px)}
+.student-delete-dialog h2 {font-size:21px;margin-bottom:16px}
+.dialog-icon {display:grid;place-items:center;width:46px;height:46px;border-radius:13px;color:#af4840;background:#fff0ed;margin-bottom:16px}
+.dialog-icon .icon {width:23px;height:23px}
+.delete-identity {padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#f8fafc;font-size:12px;overflow-wrap:anywhere}
+.delete-identity strong:first-child {font-size:14px}
+#delete-explanation {font-size:13px;color:#64748b}
+.dialog-actions {display:flex;justify-content:flex-end;gap:10px;padding-top:14px}
+@media(max-width:1150px) {
+  .student-directory .student-head {display:none}
+  .student-directory .student-row {grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px;padding:18px}
+  .student-row>.student-identity,.student-actions {grid-column:1/-1}
+  .student-cell-label {display:block;color:var(--muted);font-size:10px;margin-bottom:4px}
+  .student-actions {padding-top:5px}
+  .student-directory .student {min-width:0}
+}
+@media(max-width:680px) {
+  .student-actions {gap:7px}
+  .student-actions .action-button {min-height:40px;padding:8px 10px}
+  .student-delete-dialog {padding:22px}
+  .dialog-actions {flex-wrap:wrap}
+}
+
+/* Student workspace. Keep every rule scoped away from other pages. */
+.student-create-panel,
+.student-directory-panel {
+  width:100%;
+  max-width:none;
+  margin-inline:0;
+  padding:18px;
+  margin-bottom:16px;
+  border-radius:13px;
+}
+main:has(>.student-directory-panel)>.topbar {margin-bottom:20px}
+main:has(>.student-directory-panel)>.page-header {margin-bottom:18px}
+.student-create-panel .panel-heading,
+.student-directory-panel .panel-heading {margin-bottom:12px;gap:12px}
+.student-create-panel h2,
+.student-directory-panel h2 {font-size:16px;margin-bottom:3px}
+.student-create-panel .panel-heading p,
+.student-directory-panel .panel-heading p {font-size:11px;line-height:1.5}
+.student-create-panel .form-grid {gap:12px}
+.student-create-panel label {gap:5px;font-size:11px}
+.student-create-panel input,
+.student-create-panel select {min-height:38px;padding:8px 10px;border-radius:8px;font-size:12px}
+.student-create-panel button {min-height:36px;padding:7px 13px;border-radius:8px}
+.student-directory-panel .search-box {max-width:240px}
+.student-directory-panel .search-box input {min-height:36px;padding-block:7px;border-radius:8px;font-size:12px}
+.student-directory-panel .search-box>.icon {bottom:10px}
+.student-directory-panel .notice {padding:9px 11px;gap:8px;margin-bottom:12px;border-radius:8px;font-size:11px;line-height:1.5}
+.student-directory-panel .notice>.icon {width:15px;height:15px}
+.student-directory-panel .student-directory {border-radius:9px}
+.student-directory-panel .student-head,
+.student-directory-panel .student-row {
+  grid-template-columns:minmax(0,25fr) minmax(0,16fr) minmax(0,12fr) minmax(110px,15fr) minmax(265px,32fr);
+  gap:8px;
+  padding:12px;
+}
+.student-directory-panel .student-head {font-size:9px;letter-spacing:.2px;padding-block:11px;border-radius:9px 9px 0 0}
+.student-directory-panel .student-row {min-height:62px;font-size:12px;line-height:1.45}
+.student-directory-panel .student-identity {gap:10px}
+.student-directory-panel .avatar {width:30px;height:30px;font-size:12px;border-radius:9px}
+.student-directory-panel .student-code {font-size:11px}
+.student-directory-panel .badge {padding:4px 7px;font-size:10px;border-radius:5px}
+.student-directory-panel .student-actions {gap:8px;flex-wrap:nowrap;padding-top:0;justify-content:flex-start}
+.student-directory-panel .student-actions .action-button {min-height:36px;padding:7px 9px;border-radius:7px;font-size:11px;gap:4px}
+.student-directory-panel .student-actions .icon {width:14px;height:14px}
+.student-directory-panel .student-body {padding:16px}
+.student-directory-panel .student>summary {padding:10px 16px}
+@media(max-width:1150px) {
+  .student-directory-panel .student-head {display:none}
+  .student-directory-panel .student-row {grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 16px;padding:13px}
+  .student-directory-panel .student-cell-label {font-size:10px;margin-bottom:3px}
+  .student-directory-panel .student-actions {padding-top:3px}
+}
+@media(max-width:680px) {
+  .student-create-panel,.student-directory-panel {padding:16px 13px;margin-bottom:14px;border-radius:12px}
+  .student-directory-panel .search-box {max-width:none}
+  .student-directory-panel .student-actions {gap:6px;flex-wrap:wrap}
+  .student-directory-panel .student-actions .action-button {min-height:40px;padding:8px 9px}
+  .student-create-panel input,.student-create-panel select {min-height:42px}
+  .student-create-panel button {min-height:42px}
+  .student-directory-panel .student-body {padding:13px}
+}

@@ -2,6 +2,8 @@
 .env.*
 !.env.example
 tests/.browser-profile*/
+# Disposable CSS-only image build contexts; keep actual test scripts visible.
+/tests/.css-deploy-*/
 *.log
 tests/.cookies*
 *.tmp
@@ -20,5 +22,16 @@ Thumbs.db
 secrets/
 # Generated local read-only log mounts; regenerate after container recreation.
 docker-compose.override.yml
-# Local screenshots from earlier phases are outside Commit 6; keep on disk.
-/docs/screenshots/
+# Earlier screenshots stay local; only reviewed user captures are eligible.
+/docs/screenshots/*
+!/docs/screenshots/modern-ui/
+/docs/screenshots/modern-ui/*
+!/docs/screenshots/modern-ui/README.md
+!/docs/screenshots/modern-ui/01-tong-quan.png
+!/docs/screenshots/modern-ui/02-quan-ly-lop.png
+!/docs/screenshots/modern-ui/03-quan-ly-sinh-vien.png
+!/docs/screenshots/modern-ui/04-diem-danh.png
+!/docs/screenshots/modern-ui/05-lich-su.png
+!/docs/screenshots/modern-ui/06-thong-ke.png
+# All 323 automated screenshots and their local manifests remain outside Git.
+/docs/ui-automated/

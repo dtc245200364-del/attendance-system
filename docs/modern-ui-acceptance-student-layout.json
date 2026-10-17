@@ -1,0 +1,230 @@
+﻿{
+    "checks":  [
+                   {
+                       "pass":  true,
+                       "name":  "panels match overview content edges 390px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "panels match overview content edges 390px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no horizontal page overflow 390px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "panels match overview content edges 768px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "panels match overview content edges 768px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no horizontal page overflow 768px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "panels match overview content edges 1024px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "panels match overview content edges 1024px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no horizontal page overflow 1024px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "panels match overview content edges 1366px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "panels match overview content edges 1366px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no horizontal page overflow 1366px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "three actions on one row 1366px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "five column headers aligned 1366px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "row height 60 to 64 1366px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "panels match overview content edges 1440px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "panels match overview content edges 1440px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no horizontal page overflow 1440px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "three actions on one row 1440px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "five column headers aligned 1440px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "row height 60 to 64 1440px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "panels match overview content edges 1920px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "panels match overview content edges 1920px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "no horizontal page overflow 1920px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "three actions on one row 1920px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "five column headers aligned 1920px"
+                   },
+                   {
+                       "pass":  true,
+                       "name":  "row height 60 to 64 1920px"
+                   }
+               ],
+    "measurements":  [
+                         {
+                             "panels":  [
+                                            {
+                                                "left":  16,
+                                                "right":  16,
+                                                "width":  358
+                                            },
+                                            {
+                                                "left":  16,
+                                                "right":  16,
+                                                "width":  358
+                                            }
+                                        ],
+                             "viewport":  390,
+                             "overview":  {
+                                              "left":  16,
+                                              "right":  16
+                                          }
+                         },
+                         {
+                             "panels":  [
+                                            {
+                                                "left":  222,
+                                                "right":  22,
+                                                "width":  509
+                                            },
+                                            {
+                                                "left":  222,
+                                                "right":  22,
+                                                "width":  509
+                                            }
+                                        ],
+                             "viewport":  768,
+                             "overview":  {
+                                              "left":  222,
+                                              "right":  22
+                                          }
+                         },
+                         {
+                             "panels":  [
+                                            {
+                                                "left":  246,
+                                                "right":  26,
+                                                "width":  737
+                                            },
+                                            {
+                                                "left":  246,
+                                                "right":  26,
+                                                "width":  737
+                                            }
+                                        ],
+                             "viewport":  1024,
+                             "overview":  {
+                                              "left":  246,
+                                              "right":  26
+                                          }
+                         },
+                         {
+                             "panels":  [
+                                            {
+                                                "left":  286,
+                                                "right":  36,
+                                                "width":  1044
+                                            },
+                                            {
+                                                "left":  286,
+                                                "right":  36,
+                                                "width":  1044
+                                            }
+                                        ],
+                             "viewport":  1366,
+                             "overview":  {
+                                              "left":  286,
+                                              "right":  36
+                                          }
+                         },
+                         {
+                             "panels":  [
+                                            {
+                                                "left":  286,
+                                                "right":  36,
+                                                "width":  1118
+                                            },
+                                            {
+                                                "left":  286,
+                                                "right":  36,
+                                                "width":  1118
+                                            }
+                                        ],
+                             "viewport":  1440,
+                             "overview":  {
+                                              "left":  286,
+                                              "right":  36
+                                          }
+                         },
+                         {
+                             "panels":  [
+                                            {
+                                                "left":  286,
+                                                "right":  36,
+                                                "width":  1598
+                                            },
+                                            {
+                                                "left":  286,
+                                                "right":  36,
+                                                "width":  1598
+                                            }
+                                        ],
+                             "viewport":  1920,
+                             "overview":  {
+                                              "left":  286,
+                                              "right":  36
+                                          }
+                         }
+                     ],
+    "failed":  0,
+    "passed":  27
+}
