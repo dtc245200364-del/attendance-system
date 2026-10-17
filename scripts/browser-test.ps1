@@ -1,5 +1,7 @@
-param([int]$Port = 18087, [int]$DebugPort = 19227, [string]$EvidenceDirectory = 'docs/evidence/phase2')
+param([int]$Port = 18087, [int]$DebugPort = 19227, [string]$EvidenceDirectory = 'docs/evidence/phase2', [string]$ComposeFile='', [string]$ComposeEnvFile='')
 $ErrorActionPreference = 'Stop'
+$composeArgs=@('compose'); if ($ComposeFile) { $composeArgs+=@('-f',$ComposeFile) }
+if ($ComposeEnvFile) { $composeArgs+=@('--env-file',$ComposeEnvFile) }
 $root = Split-Path $PSScriptRoot -Parent
 $evidence = Join-Path $root $EvidenceDirectory
 New-Item -ItemType Directory -Force $evidence | Out-Null
@@ -49,9 +51,9 @@ function Screenshot($name) {
     [IO.File]::WriteAllBytes((Join-Path $evidence $name),[Convert]::FromBase64String($shot.data))
 }
 try {
-    & "$PSScriptRoot/copy-web-test.ps1" -Source tests/browser-fixture.php -Name attendance-browser-fixture.php
+    & "$PSScriptRoot/copy-web-test.ps1" -Source tests/browser-fixture.php -Name attendance-browser-fixture.php -ComposeFile $ComposeFile -ComposeEnvFile $ComposeEnvFile
     if ($LASTEXITCODE -ne 0) { throw 'Fixture copy failed' }
-    $fixture=docker compose exec -T web php /tmp/attendance-browser-fixture.php create $prefix | ConvertFrom-Json
+    $fixture= & docker @composeArgs exec -T web php /tmp/attendance-browser-fixture.php create $prefix | ConvertFrom-Json
     if ($LASTEXITCODE -ne 0) { throw 'Fixture creation failed' }
     $browserArgs=@('--headless=new','--disable-gpu','--no-first-run','--no-default-browser-check','--enable-logging=stderr',"--remote-debugging-port=$DebugPort",'--remote-debugging-address=127.0.0.1',"--user-data-dir=`"$profile`"",'about:blank')
     $process=Start-Process -FilePath $chrome -ArgumentList $browserArgs -WindowStyle Hidden -PassThru -RedirectStandardError (Join-Path $root 'tests/browser-stderr.log')
@@ -110,5 +112,5 @@ try {
     if ($socket -and $socket.State -eq 'Open') { try { Cdp 'Browser.close' | Out-Null } catch {} }
     if ($socket) { $socket.Dispose() }
     if ($process -and !$process.HasExited) { Stop-Process -Id $process.Id -ErrorAction SilentlyContinue }
-    if ($fixture) { docker compose exec -T web php /tmp/attendance-browser-fixture.php cleanup $prefix }
+    if ($fixture) { & docker @composeArgs exec -T web php /tmp/attendance-browser-fixture.php cleanup $prefix }
 }

@@ -1,0 +1,74 @@
+PASS: HTTP /
+PASS: HTTP /classes.php
+PASS: HTTP /students.php
+PASS: HTTP /attendance.php
+PASS: HTTP /history.php
+PASS: HTTP /statistics.php
+PASS: HTTP /assets/style.css
+PASS: HTTP /assets/base.css
+PASS: CSRF token
+PASS: security headers
+PASS: reject missing CSRF
+PASS: reject wrong CSRF
+PASS: reject array CSRF
+PASS: reject nonexistent record classes.php
+PASS: reject nonexistent record students.php
+PASS: reject blank name
+PASS: reject long name
+PASS: reject invalid class code
+PASS: create class
+PASS: escape stored XSS
+PASS: unique class code
+PASS: edit class
+PASS: invalid email
+PASS: create student 1
+PASS: create student 2
+PASS: create student 3
+PASS: unique student code
+PASS: cannot delete class with students
+PASS: reject invalid date
+PASS: create session
+PASS: snapshot roster unmarked
+PASS: unique class and start
+PASS: DB duplicate attendance constraint
+PASS: DB foreign key
+PASS: save three attendance states
+PASS: resave attendance idempotently
+PASS: resave creates no duplicates
+PASS: reject invalid status atomically
+PASS: rollback keeps previous status
+PASS: reject incomplete roster
+PASS: archive student
+PASS: archive preserves history
+PASS: create second session
+PASS: archived student excluded from new roster
+PASS: restore student
+PASS: create second class
+PASS: DB rejects cross-class insert
+PASS: DB rejects cross-class attendance update
+PASS: DB rejects transferring student with history
+PASS: DB rejects transferring populated session
+PASS: HTTP rejects foreign student roster
+PASS: block class transfer with history
+PASS: edit student
+PASS: reject session with empty roster
+PASS: history filters
+PASS: reject SQL injection filter
+PASS: reject invalid date filter
+PASS: reject array history filter
+PASS: reject reversed date range
+PASS: reject array identifier
+PASS: statistics computed from marked records
+PASS: exact student rate 100%
+PASS: exact student rate 0%
+PASS: exact student rate 100%
+PASS: history total includes pending
+PASS: empty history state
+PASS: SQL payload stored as data
+PASS: edited student no stale unsafe HTML
+PASS: history pagination first page
+PASS: history pagination second page six records
+PASS: DB app cannot create tables
+PASS: delete empty class
+RESULT: 72 assertions passed
+Test fixtures cleaned.

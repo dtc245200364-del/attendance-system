@@ -20,3 +20,5 @@ Thumbs.db
 secrets/
 # Generated local read-only log mounts; regenerate after container recreation.
 docker-compose.override.yml
+# Local screenshots from earlier phases are outside Commit 6; keep on disk.
+/docs/screenshots/

@@ -1,0 +1,162 @@
+{
+    "passed": 39,
+    "failed": 0,
+    "checks": [
+        {
+            "name": "create isolated session",
+            "pass": true
+        },
+        {
+            "name": "first user saves",
+            "pass": true
+        },
+        {
+            "name": "second user stale form HTTP 409 and reload guidance",
+            "pass": true
+        },
+        {
+            "name": "stale form does not overwrite",
+            "pass": true
+        },
+        {
+            "name": "two tabs sharing one browser session reject stale save",
+            "pass": true
+        },
+        {
+            "name": "simultaneous independent users: exactly one commit and one conflict",
+            "pass": true
+        },
+        {
+            "name": "concurrent winner preserved in MySQL",
+            "pass": true
+        },
+        {
+            "name": "fresh form saves after concurrent conflict",
+            "pass": true
+        },
+        {
+            "name": "change to late",
+            "pass": true
+        },
+        {
+            "name": "change back to present",
+            "pass": true
+        },
+        {
+            "name": "ABA transition still rejects old form",
+            "pass": true
+        },
+        {
+            "name": "unchanged save accepted",
+            "pass": true
+        },
+        {
+            "name": "replayed form rejected even after unchanged save",
+            "pass": true
+        },
+        {
+            "name": "missing end sentinel rejected",
+            "pass": true
+        },
+        {
+            "name": "forged version rejected",
+            "pass": true
+        },
+        {
+            "name": "invalid JSON rejected",
+            "pass": true
+        },
+        {
+            "name": "incomplete JSON rejected",
+            "pass": true
+        },
+        {
+            "name": "invalid state rejected",
+            "pass": true
+        },
+        {
+            "name": "similar title warning with existing ID",
+            "pass": true
+        },
+        {
+            "name": "warning creates no extra session",
+            "pass": true
+        },
+        {
+            "name": "explicit confirmation creates separate session",
+            "pass": true
+        },
+        {
+            "name": "both sessions retained",
+            "pass": true
+        },
+        {
+            "name": "history semantics and session ID",
+            "pass": true
+        },
+        {
+            "name": "stored XSS escaped",
+            "pass": true
+        },
+        {
+            "name": "unmarked excluded from attendance denominator",
+            "pass": true
+        },
+        {
+            "name": "attendance session ID",
+            "pass": true
+        },
+        {
+            "name": "large roster fallback guarded and script present",
+            "pass": true
+        },
+        {
+            "name": "PHP-truncated traditional form rejected",
+            "pass": true
+        },
+        {
+            "name": "truncated form changes no rows",
+            "pass": true
+        },
+        {
+            "name": "1101-student JSON payload saved",
+            "pass": true
+        },
+        {
+            "name": "all 1101 rows saved",
+            "pass": true
+        },
+        {
+            "name": "save creates no duplicate attendance",
+            "pass": true
+        },
+        {
+            "name": "large invalid payload rolled back",
+            "pass": true
+        },
+        {
+            "name": "atomic rollback retains all states",
+            "pass": true
+        },
+        {
+            "name": "lost revision file fails closed",
+            "pass": true
+        },
+        {
+            "name": "Nginx preserves HTTP 404",
+            "pass": true
+        },
+        {
+            "name": "Nginx error response security and correlation headers",
+            "pass": true
+        },
+        {
+            "name": "Nginx preserves HTTP 403",
+            "pass": true
+        },
+        {
+            "name": "Nginx rejects body over 1 MiB before PHP",
+            "pass": true
+        }
+    ]
+}

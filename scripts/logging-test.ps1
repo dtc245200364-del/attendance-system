@@ -99,6 +99,16 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Exception test copy failed' }
     $exceptionOutput=(docker compose exec -T web sh -c 'php /tmp/attendance-logging-exception.php 2>&1') -join "`n"
     Check ($exceptionOutput.Contains('"event":"unhandled_exception"') -and !$exceptionOutput.Contains('PHASE4_PRIVATE_EXCEPTION_CANARY') -and !$exceptionOutput.Contains('Stack trace')) 'CLI exception logger omits message and stack trace'
+    # Send the sanitized CLI event to the main container stderr so the real
+    # Promtail pipeline, not just the CLI capture, must preserve diagnostic fields.
+    docker compose exec -T web sh -c 'php /tmp/attendance-logging-exception.php 2>/proc/1/fd/2 >/dev/null'
+    if ($LASTEXITCODE -ne 0) { throw 'Diagnostic log delivery failed' }
+    for ($attempt=0;$attempt -lt 12;$attempt++) {
+        $diagnostic=LogQuery '{job="attendance",service="php"} | json | event = "unhandled_exception" | error_file = "attendance-logging-exception.php" | exception_type = "RuntimeException"'
+        if ($diagnostic.data.result.Count -gt 0) { break }
+        Start-Sleep -Seconds 2
+    }
+    Check ($diagnostic.data.result.Count -gt 0) 'sanitized exception type/file/line delivered through Promtail to Loki'
     foreach ($expr in @($nginxExpr,$notFoundExpr,$countExpr)) {
         $instant=$expr -eq $countExpr
         $answer=LogQuery $expr $instant
@@ -112,7 +122,7 @@ try {
     $all=LogQuery '{job="attendance"}' $false '2h'
     $lines=@($all.data.result | ForEach-Object { $_.values | ForEach-Object { $_[1] } })
     Check (@($lines | Where-Object { $_ -like "*$canary*" }).Count -eq 0) 'query/cookie/forged-ID privacy canary absent from collected logs'
-    $invalid=@(); $allowed=@('source','event','level','status','route','method','request_id','code')
+    $invalid=@(); $allowed=@('source','event','level','status','route','method','request_id','code','exception_type','error_file','error_line','sqlstate','driver_code')
     foreach ($line in $lines) {
         try {
             $parsed=$line | ConvertFrom-Json

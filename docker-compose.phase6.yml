@@ -1,0 +1,66 @@
+name: attendance-phase6-test
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: attendance_phase1
+      MYSQL_USER: attendance_app
+      MYSQL_PASSWORD: ${PHASE6_DB_PASSWORD:?Create .env.phase6 first}
+      MYSQL_ROOT_PASSWORD: ${PHASE6_ROOT_PASSWORD:?Create .env.phase6 first}
+    volumes:
+      - phase6_test_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+      - ./database/permissions.sql:/docker-entrypoint-initdb.d/002-permissions.sql:ro
+      - ./database/consistency.sql:/docker-entrypoint-initdb.d/003-consistency.sql:ro
+    networks:
+      test:
+        ipv4_address: 172.30.96.4
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$$MYSQL_PASSWORD" mysql -h 127.0.0.1 -u "$$MYSQL_USER" "$$MYSQL_DATABASE" -e "SELECT 1"']
+      interval: 3s
+      timeout: 3s
+      retries: 40
+  web:
+    image: attendance-phase6-test-web
+    build: .
+    environment:
+      DB_HOST: db
+      DB_NAME: attendance_phase1
+      DB_USER: attendance_app
+      DB_PASSWORD: ${PHASE6_DB_PASSWORD:?Create .env.phase6 first}
+      PHASE6_TEST: '1'
+    volumes:
+      - ./tests:/phase6-tests:ro
+      - ./tests/phase6-proxy.conf:/etc/apache2/conf-enabled/attendance-proxy.conf:ro
+    tmpfs:
+      - /tmp:uid=33,gid=33,mode=1777
+      - /var/run/apache2:uid=33,gid=33,mode=0755
+      - /var/lock/apache2:uid=33,gid=33,mode=0755
+    read_only: true
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      test:
+        ipv4_address: 172.30.96.3
+  nginx:
+    image: nginx:stable-alpine
+    ports: ['127.0.0.1:18097:8080']
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/errors:/usr/share/nginx/errors:ro
+    depends_on: [web]
+    networks:
+      test_frontend:
+      test:
+        ipv4_address: 172.30.96.2
+networks:
+  test_frontend:
+  test:
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.30.96.0/29
+volumes:
+  phase6_test_data:

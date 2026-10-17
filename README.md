@@ -1,6 +1,6 @@
 # Hệ thống điểm danh sinh viên — Đề 27
 
-Triển khai **Giai đoạn 1–5** bằng PHP 8.3, PDO, MySQL 8.4, phpMyAdmin, Docker Compose, Nginx, Prometheus/Grafana và Loki/Promtail, kèm hardening đã kiểm chứng. Mã nguồn được viết mới từ các file khung rỗng trong workspace; không lấy mã từ container điểm danh cũ.
+Triển khai **Giai đoạn 1–6** bằng PHP 8.3, PDO, MySQL 8.4, phpMyAdmin, Docker Compose, Nginx, Prometheus/Grafana và Loki/Promtail, kèm hardening đã kiểm chứng. Mã nguồn được viết mới từ các file khung rỗng trong workspace; không lấy mã từ container điểm danh cũ.
 
 ## Khởi chạy trên Windows
 
@@ -266,4 +266,33 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/hardening-test.ps1
 
 Ứng dụng hiện **chưa có đăng nhập/phân quyền người dùng**; CSRF không thay thế xác thực. Chỉ dùng demo trên máy tin cậy với loopback, không public/tunnel hoặc dữ liệu sinh viên thật. Đề xuất giai đoạn riêng thêm login, role giảng viên/quản trị và authorization từng thao tác; chưa tự thay đổi ứng dụng trong giai đoạn này. Promtail EOL, quyền sockets và giới hạn retention vẫn như biên bản Giai đoạn 4.
 
-Xem [nghiệm thu hardening](docs/phase5-validation.md) và [hướng dẫn tự chụp ảnh thật](docs/phase5-screenshots.md). Chưa commit/push Giai đoạn 5.
+Xem [nghiệm thu hardening](docs/phase5-validation.md) và [hướng dẫn tự chụp ảnh thật](docs/phase5-screenshots.md). Giai đoạn 5 đã commit/push tại `d84251a`.
+
+## Giai đoạn 6 — Điểm danh, lịch sử và thống kê
+
+Đã kiểm thử **243 PASS, 0 FAIL; 10/10 PHP lint**: 72 HTTP/MySQL, 39 logic Giai đoạn 6/Nginx, 29 Chrome, 54 Prometheus/Grafana và 49 Loki/Promtail. Đây là kết quả lượt kiểm thử ngày 17/10/2026; không phải phép thử mới ở mỗi lần clone. [Báo cáo, bằng chứng và giới hạn](docs/phase6-validation.md).
+
+Form cũ bị từ chối bằng HTTP 409 sau khi buổi được lưu từ tab/người khác. Phiên bản dùng chung giữa PHP worker trong **một container web**, kết hợp ảnh chụp dữ liệu và kiểm tra trong transaction; không hỗ trợ nhiều replica web với thư mục tạm riêng. Hiển thị ID buổi trên điểm danh/lịch sử; tạo buổi cùng lớp/ngày có tiêu đề tương tự cần đối chiếu và xác nhận. Không tự gộp/xóa buổi, không migration database.
+
+Lịch sử hiển thị trạng thái hiện tại theo buổi và thời gian bắt đầu buổi, không phải nhật ký các lần sửa. Tỷ lệ giữ nguyên `(Có mặt + Đi muộn) / (Có mặt + Vắng mặt + Đi muộn)`; chưa điểm danh không nằm trong mẫu số. Lớp đông gửi JSON để tránh `max_input_vars`; payload thiếu/sai bị từ chối toàn bộ. Đã kiểm thử HTTP với 1.101 sinh viên; chưa kiểm thử render danh sách đó trên thiết bị vật lý. Chưa có đăng nhập/phân quyền và audit trail.
+
+**Chỉ chạy kiểm thử ghi trên stack riêng dưới đây**, thay cho lệnh test mặc định của các giai đoạn trước nếu cần bảo toàn dữ liệu gốc. Stack test dùng project `attendance-phase6-test`, cổng loopback 18097, subnet 172.30.96.0/29 và volume riêng. Nếu cổng/subnet đang dùng, dừng để điều chỉnh cấu hình test; không thay đổi tài nguyên của dự án khác.
+
+Tạo `.env.phase6` một lần cho **volume test mới**, không ghi đè file đã có, không dùng mật khẩu gốc. Lệnh này không in mật khẩu:
+
+```powershell
+if (!(Test-Path -LiteralPath .env.phase6)) {
+    $phase6AppSecret = [Guid]::NewGuid().ToString('N') + [Guid]::NewGuid().ToString('N')
+    $phase6RootSecret = [Guid]::NewGuid().ToString('N') + [Guid]::NewGuid().ToString('N')
+    [IO.File]::WriteAllText((Join-Path (Get-Location) '.env.phase6'), "PHASE6_DB_PASSWORD=$phase6AppSecret`nPHASE6_ROOT_PASSWORD=$phase6RootSecret`n")
+    Remove-Variable phase6AppSecret,phase6RootSecret
+}
+docker compose --env-file .env.phase6 -f docker-compose.phase6.yml up -d --build
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/phase6-test.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/browser-test.ps1 -Port 18097 -DebugPort 19237 -ComposeFile docker-compose.phase6.yml -ComposeEnvFile .env.phase6 -EvidenceDirectory docs/evidence/phase6
+docker compose --env-file .env.phase6 -f docker-compose.phase6.yml stop
+```
+
+Giữ nguyên `.env.phase6` khi dùng lại volume test; không reset/xóa volume để đổi mật khẩu. Chrome cần cài tại đường dẫn mặc định như hướng dẫn kiểm thử trước đó. Kiểm thử giám sát/log trên stack gốc dùng các lệnh trong báo cáo Giai đoạn 6 và chỉ tạo traffic, log thử an toàn; không ghi điểm danh. Các hash trước/sau xác nhận cả bốn bảng dữ liệu gốc không đổi.
+
+Có [9 ảnh Chrome thật](docs/evidence/phase6/README.md) dùng fixture được gắn nhãn kiểm thử. Chưa có ảnh riêng của HTTP 409, cảnh báo buổi tương tự hoặc thao tác lưu 1.101 sinh viên; các tình huống này có kết quả kiểm thử tự động. Không tạo ảnh AI hay ảnh minh chứng giả. Thư mục ảnh cục bộ Giai đoạn 4–5 `docs/screenshots/` được giữ ngoài Commit 6.

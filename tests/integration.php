@@ -15,7 +15,15 @@ function http(string $path,?array $data=null): array {
     preg_match('/\s(\d{3})\s/',$response[0] ?? '',$m);
     return [(int)($m[1]??0),(string)$body,implode("\n",$response)];
 }
-function post(string $path,array $data): array { global $token; return http($path,['csrf'=>$token]+$data); }
+function post(string $path,array $data): array {
+    global $token;
+    if ($path==='/attendance.php' && ($data['action'] ?? '')==='mark') {
+        $html=http('/attendance.php?session_id='.$data['session_id'])[1];
+        preg_match('/name="version" value="([a-f0-9]{64})"/', $html, $m);
+        $data+=['version'=>$m[1] ?? '', 'complete'=>'1'];
+    }
+    return http($path,['csrf'=>$token]+$data);
+}
 function expect_constraint(callable $f,string $label): void { try {$f();} catch (PDOException $e) { check($e->getCode()==='23000',$label); return; } throw new RuntimeException('Constraint missing: '.$label); }
 function expect_consistency(callable $f,string $label): void { try {$f();} catch (PDOException $e) { check($e->getCode()==='45000',$label); return; } throw new RuntimeException('Consistency missing: '.$label); }
 try {

@@ -1,0 +1,38 @@
+{
+    "phpFilesLinted":  10,
+    "originalData":  [
+                         {
+                             "table":  "classes",
+                             "unchanged":  true,
+                             "count":  2
+                         },
+                         {
+                             "table":  "students",
+                             "unchanged":  true,
+                             "count":  4
+                         },
+                         {
+                             "table":  "sessions",
+                             "unchanged":  true,
+                             "count":  3
+                         },
+                         {
+                             "table":  "attendance",
+                             "unchanged":  true,
+                             "count":  6
+                         }
+                     ],
+    "databaseMigration":  false,
+    "testStackStopped":  true,
+    "integrationPassed":  72,
+    "loggingPassed":  49,
+    "browserPassed":  29,
+    "commitOrPush":  false,
+    "totalPassed":  243,
+    "timezone":  "Asia/Ho_Chi_Minh",
+    "testProject":  "attendance-phase6-test",
+    "date":  "2026-10-17",
+    "monitoringPassed":  54,
+    "phase6Passed":  39,
+    "failed":  0
+}
