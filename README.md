@@ -1,6 +1,23 @@
 # Hệ thống điểm danh sinh viên — Đề 27
 
-Triển khai **Giai đoạn 1–6** bằng PHP 8.3, PDO, MySQL 8.4, phpMyAdmin, Docker Compose, Nginx, Prometheus/Grafana và Loki/Promtail, kèm hardening đã kiểm chứng. Mã nguồn được viết mới từ các file khung rỗng trong workspace; không lấy mã từ container điểm danh cũ.
+Đã hoàn thành triển khai **Giai đoạn 1–6** bằng PHP 8.3, PDO, MySQL 8.4, phpMyAdmin, Docker Compose, Nginx, Prometheus/Grafana và Loki/Promtail, kèm hardening đã kiểm chứng. Mã nguồn được viết mới từ các file khung rỗng trong workspace; không lấy mã từ container điểm danh cũ.
+
+## Trạng thái hoàn thành
+
+Các giai đoạn đã có trong nhánh `main`:
+
+| Giai đoạn | Phạm vi | Commit triển khai |
+|---|---|---|
+| 1 | Ứng dụng PHP/PDO, MySQL và Docker Compose | `fcc371b` |
+| 2 | Nginx reverse proxy và security headers | `70bdee6` |
+| 3 | Prometheus, Grafana và exporters | `344f50c` |
+| 4 | Loki/Promtail và dashboard log | `76be11e` |
+| 5 | Hardening container, mạng và quyền truy cập | `d84251a` |
+| 6 | Chống ghi đè điểm danh cũ, xử lý buổi học, lịch sử và thống kê | `11d81ab` |
+
+Modern Education Dashboard đã được commit tại `fec2dcc` và merge vào `main` qua [Pull Request #1](https://github.com/dtc245200364-del/attendance-system/pull/1), merge commit `fbf4915`.
+
+Các số liệu kiểm thử bên dưới là kết quả lịch sử tại từng lần nghiệm thu, có phạm vi và giới hạn riêng; không cộng thành tổng kiểm thử hiện tại. Lần cập nhật README này chỉ đối chiếu tài liệu, cấu hình và lịch sử Git, không chạy lại kiểm thử hoặc xác nhận trạng thái runtime. Hoàn thành triển khai kỹ thuật không đồng nghĩa đã xác nhận đầy đủ mọi yêu cầu hồ sơ báo cáo Đề 27.
 
 ## Khởi chạy trên Windows
 
@@ -52,7 +69,7 @@ Lớp cần có sinh viên đang học trước khi tạo buổi. Danh sách đ�
 | `app/includes/` | PDO, validation, CSRF, layout, escaping, xử lý lỗi |
 | `app/assets/` | Giao diện tiếng Việt responsive, không phụ thuộc CDN |
 | `database/init.sql`, `database/permissions.sql` | Schema và quyền tối thiểu |
-| `Dockerfile`, `docker/php.ini`, `docker-compose.yml` | Môi trường riêng Giai đoạn 1 |
+| `Dockerfile`, `docker/php.ini`, `docker-compose.yml` | Môi trường ứng dụng và stack Giai đoạn 1–6 |
 | `scripts/`, `tests/` | Sinh cấu hình và kiểm thử thực tế |
 | `docs/phase1-validation.md` | Kết quả, giới hạn kiểm chứng |
 
@@ -70,17 +87,17 @@ Web chạy bằng `www-data`, bỏ capabilities và bật `no-new-privileges`; D
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1
 ```
 
-Script kiểm tra cấu hình Compose, cú pháp toàn bộ PHP, rồi chạy HTTP thật từ container web và kiểm tra trực tiếp MySQL. Dữ liệu kiểm thử có tiền tố ngẫu nhiên và được dọn bằng ID trong `finally`; không truncate hay xóa dữ liệu có sẵn. Không cung cấp endpoint chạy test trên website. Chạy trên môi trường Giai đoạn 1 riêng, tránh chạy khi đang thao tác dữ liệu thủ công.
+Script kiểm tra cấu hình Compose, cú pháp toàn bộ PHP, rồi chạy HTTP thật từ container web và kiểm tra trực tiếp MySQL. Dữ liệu kiểm thử có tiền tố ngẫu nhiên và được dọn bằng ID trong `finally`; không truncate hay xóa dữ liệu có sẵn. Không cung cấp endpoint chạy test trên website. Lệnh trên được giữ để tham chiếu quy trình các giai đoạn đầu. Với kiểm thử có ghi dữ liệu, dùng stack kiểm thử độc lập và hướng dẫn ở Giai đoạn 6; không chạy trên database gốc.
 
 ## Giới hạn phạm vi
 
-Ứng dụng hiện phục vụ bài thực hành trên máy cục bộ, **chưa có đăng nhập/phân quyền người dùng và HTTPS**. Đã kiểm tra giao diện bằng Chrome headless ở 390/768/1440px; chưa kiểm tra trên thiết bị vật lý hoặc Safari/Firefox. Bảng dữ liệu cuộn ngang trên màn hình nhỏ. Nginx thuộc Giai đoạn 2, Prometheus/Grafana thuộc Giai đoạn 3. Chưa triển khai Loki/Promtail hoặc hardening toàn bộ stack; các file khung logging vẫn rỗng. Không coi kết quả hiện tại là hoàn tất toàn bộ đề thi.
+Ứng dụng hiện phục vụ bài thực hành trên máy cục bộ, **chưa có đăng nhập/phân quyền người dùng và HTTPS**. Đã kiểm tra giao diện bằng Chrome headless ở 390/768/1440px; chưa kiểm tra trên thiết bị vật lý hoặc Safari/Firefox. Bảng dữ liệu cuộn ngang trên màn hình nhỏ. Nginx, Prometheus/Grafana, Loki/Promtail và hardening đã được triển khai lần lượt ở Giai đoạn 2–5. Mô tả cũ “chưa triển khai Loki/Promtail hoặc hardening, file khung logging còn rỗng” chỉ phản ánh thời điểm Giai đoạn 1, không phải trạng thái mã nguồn hiện tại. Các giới hạn về xác thực, HTTPS và kiểm chứng vẫn áp dụng sau khi hoàn thành Giai đoạn 1–6.
 
-Repository Git riêng được tạo trong workspace để lưu mã nguồn Giai đoạn 1. GitHub: https://github.com/dtc245200364-del/attendance-system. Commit đầu tiên: `feat: implement attendance application and MySQL database`. Các commit tiếp theo và báo cáo tối thiểu 10 trang thuộc phần việc sau; không tạo ảnh minh chứng giả.
+Repository Git riêng được tạo trong workspace để lưu mã nguồn Giai đoạn 1. GitHub: https://github.com/dtc245200364-del/attendance-system. Commit đầu tiên: `feat: implement attendance application and MySQL database`. Tại Giai đoạn 1, các commit tiếp theo và báo cáo tối thiểu 10 trang được ghi là công việc tiếp theo. Hiện mã nguồn Giai đoạn 1–6 và Modern Education Dashboard đã có trên `main`; trạng thái hoàn thành báo cáo tối thiểu 10 trang chưa được xác minh trong lần cập nhật này. Chỉ sử dụng minh chứng thật, không tạo ảnh minh chứng giả.
 
 ## Nghiệm thu Giai đoạn 1 — 16/10/2026
 
-Kết quả cuối: **72 kiểm tra HTTP/MySQL + 29 kiểm tra Chrome + 17 kiểm tra hạ tầng/an toàn = 118 đạt, 0 thất bại**; 8 file ứng dụng PHP qua kiểm tra cú pháp. Chi tiết và giới hạn tại [biên bản nghiệm thu](docs/phase1-acceptance.md). [Ảnh chụp trình duyệt thật](docs/evidence/README.md) dùng dữ liệu có nhãn kiểm thử; không phải dữ liệu điểm danh thực tế.
+Kết quả lịch sử khi nghiệm thu Giai đoạn 1: **72 kiểm tra HTTP/MySQL + 29 kiểm tra Chrome + 17 kiểm tra hạ tầng/an toàn = 118 đạt, 0 thất bại**; 8 file ứng dụng PHP qua kiểm tra cú pháp. Chi tiết và giới hạn tại [biên bản nghiệm thu](docs/phase1-acceptance.md). [Ảnh chụp trình duyệt thật](docs/evidence/README.md) dùng dữ liệu có nhãn kiểm thử; không phải dữ liệu điểm danh thực tế.
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1
@@ -138,7 +155,7 @@ Kết quả Giai đoạn 2: **242 assertions đạt / 0 thất bại ở lượt
 
 ## Giai đoạn 3 — Prometheus và Grafana
 
-**Trạng thái hiện tại: đã triển khai và kiểm thử cục bộ.** Sau khi người dùng chuyển Docker disk image sang `D:\DockerDesktopData\DockerDesktopWSL`, Docker hoạt động bình thường. Giai đoạn 3 đạt **147/147 kiểm tra cuối**, 4 targets UP/0 DOWN, 9 panel có dữ liệu thật qua Prometheus và Grafana API; CPU/RAM/network có series cho 9 service. Xem [biên bản thực tế](docs/phase3-validation.md). Lỗi thiếu dung lượng trước đó được lưu như lịch sử, không phải trạng thái hiện tại.
+**Đã triển khai; kết quả dưới đây thuộc lần nghiệm thu Giai đoạn 3.** Sau khi người dùng chuyển Docker disk image sang `D:\DockerDesktopData\DockerDesktopWSL`, Docker hoạt động bình thường. Giai đoạn 3 đạt **147/147 kiểm tra cuối**, 4 targets UP/0 DOWN, 9 panel có dữ liệu thật qua Prometheus và Grafana API; CPU/RAM/network có series cho 9 service. Xem [biên bản thực tế](docs/phase3-validation.md). Lỗi thiếu dung lượng trước đó được lưu như lịch sử, không phải trạng thái hiện tại.
 
 ```mermaid
 flowchart LR
@@ -157,7 +174,7 @@ Mạng `monitoring` là internal. Chỉ Prometheus/Grafana có thêm mạng UI v
 
 `attendance_monitor` chỉ có **USAGE**, tối đa 3 kết nối; chỉ bật global status/variables, tắt collector cần đọc bảng, replication hoặc quyền PROCESS. Không cấp SELECT trên dữ liệu sinh viên, không dùng root hay user ứng dụng cho exporter. File `secrets/monitoring-user.sql` được sinh cục bộ; `CREATE USER IF NOT EXISTS` không đổi mật khẩu của tài khoản đã tồn tại. Nếu credentials mất/không khớp, cần xử lý có chủ đích, không xóa volume hoặc chạy lại sinh mật khẩu một cách tùy tiện.
 
-**cAdvisor:** chạy root để đọc cgroup của Linux VM, `cgroup: host`, đọc `/`, `/sys`, `/var/lib/docker` và Docker socket; không `privileged`, không thêm capabilities. Docker Desktop hiện cần `--containerd=/rootfs/run/containerd/containerd.sock` để đăng ký Docker factory; socket này nằm trong mount đã có. Tắt collector `disk` vì không cần cho CPU/RAM/network và tránh phải cấp quyền đọc thư mục riêng; không thu OOM events do không cấp `/dev/kmsg`. Docker/containerd socket mount `:ro` vẫn cho phép API thực hiện thao tác ghi nếu tiến trình bị chiếm quyền; đây là quyền nhạy cảm, không tương đương API read-only. Không public cAdvisor; Prometheus chỉ lưu metrics có label project này. cAdvisor vẫn có khả năng quan sát metadata container khác trong Docker VM; không thao tác dừng/sửa chúng. Không dùng stack này như một mô hình tenant isolation mạnh.
+**cAdvisor tại Giai đoạn 3 (lịch sử; mount hiện tại xem Giai đoạn 5):** chạy root để đọc cgroup của Linux VM, `cgroup: host`, đọc `/`, `/sys`, `/var/lib/docker` và Docker socket; không `privileged`, không thêm capabilities. Docker Desktop hiện cần `--containerd=/rootfs/run/containerd/containerd.sock` để đăng ký Docker factory; socket này nằm trong mount đã có. Tắt collector `disk` vì không cần cho CPU/RAM/network và tránh phải cấp quyền đọc thư mục riêng; không thu OOM events do không cấp `/dev/kmsg`. Docker/containerd socket mount `:ro` vẫn cho phép API thực hiện thao tác ghi nếu tiến trình bị chiếm quyền; đây là quyền nhạy cảm, không tương đương API read-only. Không public cAdvisor; Prometheus chỉ lưu metrics có label project này. cAdvisor vẫn có khả năng quan sát metadata container khác trong Docker VM; không thao tác dừng/sửa chúng. Không dùng stack này như một mô hình tenant isolation mạnh.
 
 Trên stack đã có (không khởi động lại DB): chạy setup monitoring **một lần**, sau đó `scripts/start-monitoring.ps1`. Script cấp tài khoản bằng root bên trong DB, không in mật khẩu, chỉ cập nhật Nginx và service giám sát. Cài mới làm theo thứ tự ở đầu README. Không commit `.env.grafana`, `secrets/`, log hay profile trình duyệt. Grafana chỉ đọc mật khẩu admin lúc khởi tạo database Grafana lần đầu; đổi file env không tự đổi mật khẩu tài khoản đã tồn tại.
 
@@ -206,7 +223,7 @@ docker compose restart grafana
 
 Script start yêu cầu Nginx/PHP/MySQL đang chạy, xác minh project/service/log driver rồi sinh `docker-compose.override.yml` cục bộ, được Git và Docker build bỏ qua. File này chỉ mount **đúng ba file JSON log** read-only, không mount thư mục metadata container, Docker socket hoặc log dự án khác. Compose tự đọc override. **Chạy lại script sau khi recreate Nginx/web/db**; nếu Docker xoay file log, restart Promtail để gắn lại file hiện tại, rồi kiểm tra log mới tới Loki. Không tạo file override khác cùng tên. Với stack cài mới, hoàn thành bước khởi tạo ứng dụng và monitoring bên trên trước, rồi mới chạy script logging.
 
-Promtail dùng UID 0 để đọc file Docker thuộc root; bỏ toàn bộ capabilities, root filesystem read-only, chỉ ghi positions trên volume riêng. Loki dùng UID 10001. Không cấp privileged hoặc mount socket cho hai dịch vụ mới. cAdvisor vẫn giữ quyền đã ghi trong Giai đoạn 3.
+Promtail dùng UID 0 để đọc file Docker thuộc root; bỏ toàn bộ capabilities, root filesystem read-only, chỉ ghi positions trên volume riêng. Loki dùng UID 10001. Không cấp privileged hoặc mount socket cho hai dịch vụ mới. Tại Giai đoạn 4, cAdvisor còn giữ quyền của Giai đoạn 3; cấu hình mount sau hardening được mô tả ở Giai đoạn 5.
 
 Nginx ghi method giới hạn, route từ allowlist, status, level và request ID do edge tạo; không ghi IP/query/cookie/body vào access log mới. PHP ghi sự kiện `request_completed` và exception chung, không ghi message/stack trace/SQL. Promtail bỏ mọi dòng không khớp định dạng được duyệt; log MySQL chỉ giữ severity và mã `MY-xxxxxx`, không giữ câu SQL hay nội dung thông báo. Các nhãn là `job`, `service`, `container`, `log_type`, `level`, `status` nếu có; request ID chỉ ở nội dung để tránh cardinality cao. Raw log Docker của Apache/Nginx error có thể vẫn chứa dữ liệu request, **không chuyển những dòng đó vào Loki**, không đưa raw log lên GitHub.
 
@@ -233,7 +250,7 @@ Tạo 404 mới tại http://127.0.0.1:18087/phase4-log-proof; chọn Last 15 mi
 
 ## Giai đoạn 5 — Hardening
 
-Giữ nguyên nghiệp vụ, giao diện và bốn cổng loopback hiện tại. PHP vẫn UID/GID 33; MySQL daemon hiện UID/GID 999 theo image, không ép user/khởi động lại DB. Chín service ứng dụng/observability có root filesystem read-only, `cap_drop: ALL`, `no-new-privileges`, giới hạn CPU/RAM/PID. Các volume ghi dữ liệu Prometheus/Grafana/Loki/positions giữ nguyên; PHP chỉ ghi tmpfs `/tmp`, `/var/run/apache2`, `/var/lock/apache2` với UID 33, noexec/nosuid và giới hạn dung lượng. Session PHP trong tmpfs mất khi recreate container; đây không phải dữ liệu MySQL.
+Giai đoạn 5 giữ nguyên nghiệp vụ, giao diện tại thời điểm triển khai và bốn cổng loopback; giao diện được cập nhật sau đó trong Modern Education Dashboard. PHP vẫn UID/GID 33; MySQL daemon hiện UID/GID 999 theo image, không ép user/khởi động lại DB. Chín service ứng dụng/observability có root filesystem read-only, `cap_drop: ALL`, `no-new-privileges`, giới hạn CPU/RAM/PID. Các volume ghi dữ liệu Prometheus/Grafana/Loki/positions giữ nguyên; PHP chỉ ghi tmpfs `/tmp`, `/var/run/apache2`, `/var/lock/apache2` với UID 33, noexec/nosuid và giới hạn dung lượng. Session PHP trong tmpfs mất khi recreate container; đây không phải dữ liệu MySQL.
 
 | Nhóm đã kiểm chứng | Cấu hình và phép thử thực tế |
 |---|---|
@@ -297,8 +314,8 @@ Giữ nguyên `.env.phase6` khi dùng lại volume test; không reset/xóa volum
 
 Có [9 ảnh Chrome thật](docs/evidence/phase6/README.md) dùng fixture được gắn nhãn kiểm thử. Chưa có ảnh riêng của HTTP 409, cảnh báo buổi tương tự hoặc thao tác lưu 1.101 sinh viên; các tình huống này có kết quả kiểm thử tự động. Không tạo ảnh AI hay ảnh minh chứng giả. Thư mục ảnh cục bộ Giai đoạn 4–5 `docs/screenshots/` được giữ ngoài Commit 6.
 
-## Modern Education Dashboard — đã nghiệm thu kỹ thuật, chưa commit
+## Modern Education Dashboard — đã commit và merge vào main
 
 Giao diện sáu trang được thiết kế lại trên nhánh `feature/modern-attendance-ui`, từ Commit 6. Layout dùng sidebar xanh đậm, icon SVG nội bộ, KPI/bảng/form thống nhất, tìm kiếm sinh viên phía trình duyệt và biểu đồ từ dữ liệu thật. Phạm vi cuối cùng bao gồm form Sửa, Ngừng theo dõi/Khôi phục và Xóa an toàn: sinh viên có bất kỳ lượt điểm danh nào, kể cả Chưa điểm danh, không được xóa; dùng Ngừng theo dõi để giữ lịch sử. Không đổi schema, CSRF, transaction, version, HTTP 409 hoặc công thức chuyên cần.
 
-Bản UI đã triển khai tại http://127.0.0.1:18087, gồm chiều rộng trang Sinh viên đã duyệt; **đã stage để người dùng xác nhận, chưa commit/push/merge**. Lượt nghiệm thu đạt **455 PASS, 0 FAIL; PHP lint 10/10** trên database kiểm thử độc lập cho các thao tác ghi. [Tài liệu bàn giao](docs/modern-ui-validation.md) mô tả đúng phạm vi cuối cùng, công thức thống kê, bảo toàn MySQL/monitoring và cách tái hiện. [6 ảnh Chrome do người dùng chụp](docs/screenshots/modern-ui/README.md) đã được kiểm tra; người dùng xác nhận dữ liệu hiển thị là giả lập và được phép công khai. Toàn bộ ảnh kiểm thử tự động giữ ngoài commit. Cả bốn bảng dữ liệu gốc giữ nguyên hash trước/sau. Chỉ dùng [danh sách file đề xuất](docs/modern-ui-commit-files.txt) để chuẩn bị commit; ảnh thật chứa dữ liệu gốc và các bản ghi triển khai cục bộ được giữ ngoài danh sách.
+Bản UI đã triển khai tại http://127.0.0.1:18087, gồm chiều rộng trang Sinh viên đã duyệt; **đã commit tại `fec2dcc` và merge vào `main` qua Pull Request #1 (`fbf4915`)**. Địa chỉ triển khai này được ghi nhận trong tài liệu bàn giao, chưa kiểm tra lại runtime ở lần cập nhật README. Lượt nghiệm thu lịch sử đạt **455 PASS, 0 FAIL; PHP lint 10/10** trên database kiểm thử độc lập cho các thao tác ghi. [Tài liệu bàn giao](docs/modern-ui-validation.md) mô tả phạm vi, công thức thống kê, bảo toàn MySQL/monitoring và cách tái hiện; các câu “đã stage, chưa commit/push/merge” trong tài liệu đó là trạng thái lịch sử trước khi merge PR #1. [6 ảnh Chrome do người dùng chụp](docs/screenshots/modern-ui/README.md) đã được kiểm tra; người dùng xác nhận dữ liệu hiển thị là giả lập và được phép công khai. Toàn bộ ảnh kiểm thử tự động giữ ngoài commit. Theo biên bản nghiệm thu, cả bốn bảng dữ liệu gốc giữ nguyên hash trước/sau. [Danh sách file đề xuất](docs/modern-ui-commit-files.txt) lưu phạm vi chuẩn bị commit UI tại thời điểm đó; ảnh thật chứa dữ liệu gốc và các bản ghi triển khai cục bộ được giữ ngoài danh sách. Đây là hồ sơ lịch sử, không phải yêu cầu staging hiện tại.
