@@ -1,30 +1,50 @@
 # Hệ thống điểm danh sinh viên — Đề 27
 
-Đã hoàn thành triển khai **Giai đoạn 1–6** bằng PHP 8.3, PDO, MySQL 8.4, phpMyAdmin, Docker Compose, Nginx, Prometheus/Grafana và Loki/Promtail, kèm hardening đã kiểm chứng. Mã nguồn được viết mới từ các file khung rỗng trong workspace; không lấy mã từ container điểm danh cũ.
+Ứng dụng PHP 8.3/PDO, MySQL 8.4 và Docker Compose, có giao diện tiếng Việt, Nginx reverse proxy, Prometheus/Grafana, Loki/Promtail và hardening.
 
-## Trạng thái hoàn thành
+**Trạng thái triển khai cập nhật ngày 23/10/2026:** đăng nhập, đăng xuất và phân quyền **Admin/Giảng viên đã triển khai thành công** tại http://127.0.0.1:18087. Theo [biên bản production 2B](docs/auth-stage2b-live.md), migration xác thực đã hoàn tất, website đã tắt bảo trì; đăng nhập/đăng xuất Admin, sáu menu, CSRF và hash dữ liệu nghiệp vụ đã được xác minh. Quyền Giảng viên được kiểm thử trên database cách ly; không tạo tài khoản thử hoặc phân công thử trên production.
 
-Các giai đoạn đã có trong nhánh `main`:
+Lần chỉnh README này đối chiếu mã nguồn, cấu hình và hồ sơ triển khai; **chưa xác minh lại runtime** vì không kết nối được Docker API và HTTP cục bộ. Các số liệu nghiệm thu bên dưới là kết quả lịch sử, không cộng thành tổng kiểm thử hiện tại.
 
-| Giai đoạn | Phạm vi | Commit triển khai |
+## Các giai đoạn đã hoàn thành
+
+| Giai đoạn | Phạm vi | Commit |
 |---|---|---|
-| 1 | Ứng dụng PHP/PDO, MySQL và Docker Compose | `fcc371b` |
+| 1 | Ứng dụng PHP/PDO, MySQL, Docker Compose | `fcc371b` |
 | 2 | Nginx reverse proxy và security headers | `70bdee6` |
 | 3 | Prometheus, Grafana và exporters | `344f50c` |
 | 4 | Loki/Promtail và dashboard log | `76be11e` |
 | 5 | Hardening container, mạng và quyền truy cập | `d84251a` |
 | 6 | Chống ghi đè điểm danh cũ, xử lý buổi học, lịch sử và thống kê | `11d81ab` |
 
-Modern Education Dashboard đã được commit tại `fec2dcc` và merge vào `main` qua [Pull Request #1](https://github.com/dtc245200364-del/attendance-system/pull/1), merge commit `fbf4915`.
+Sáu giai đoạn đã có trên `main`. Modern Education Dashboard được commit tại `fec2dcc`, merge qua [Pull Request #1](https://github.com/dtc245200364-del/attendance-system/pull/1), merge commit `fbf4915`. Hồ sơ xác thực thuộc nhánh `feature/dang-nhap-phan-quyen`; triển khai thực tế không đồng nghĩa các thay đổi này đã được commit/merge vào `main`.
 
-Các số liệu kiểm thử bên dưới là kết quả lịch sử tại từng lần nghiệm thu, có phạm vi và giới hạn riêng; không cộng thành tổng kiểm thử hiện tại. Lần cập nhật README này chỉ đối chiếu tài liệu, cấu hình và lịch sử Git, không chạy lại kiểm thử hoặc xác nhận trạng thái runtime. Hoàn thành triển khai kỹ thuật không đồng nghĩa đã xác nhận đầy đủ mọi yêu cầu hồ sơ báo cáo Đề 27.
+## Sáu chức năng và phân quyền
+
+Giữ giao diện Modern Education Dashboard và đúng sáu mục sidebar:
+
+| Chức năng | Thao tác chính |
+|---|---|
+| Tổng quan | KPI, biểu đồ từ dữ liệu thật và buổi học gần đây |
+| Lớp học | Thêm/sửa mã, tên; chỉ xóa lớp trống, chưa có quan hệ dữ liệu |
+| Sinh viên | Thêm/sửa, tìm kiếm, ngừng theo dõi/khôi phục; chỉ xóa khi chưa có bất kỳ lượt điểm danh nào |
+| Điểm danh | Tạo buổi, ghi/sửa Có mặt, Vắng mặt, Đi muộn |
+| Lịch sử | Lọc theo lớp, sinh viên, khoảng ngày; phân trang 50 dòng |
+| Thống kê | Số lượt theo trạng thái và tỷ lệ tham dự từng sinh viên |
+
+- **Admin:** quản lý toàn bộ nghiệp vụ; các trang quản trị tài khoản và phân công tại `/accounts.php`, `/assignments.php` yêu cầu Admin ở server, không thêm mục sidebar.
+- **Giảng viên:** chỉ xem dữ liệu lớp được phân công và tạo buổi/điểm danh trong phạm vi đó; không sửa lớp, hồ sơ sinh viên, tài khoản hoặc phân công. Chưa được giao lớp thì danh sách trống.
+- Chưa đăng nhập được chuyển về `/login.php`. Đăng xuất dùng POST kèm CSRF; phiên hết hạn sau 30 phút không hoạt động hoặc tối đa 8 giờ. Khóa tài khoản/thay đổi phiên bản xác thực sẽ thu hồi phiên cũ.
+
+Lớp cần có sinh viên đang học trước khi tạo buổi. Danh sách được chụp tại thời điểm tạo; thêm/khôi phục sinh viên chỉ ảnh hưởng buổi mới. Không chuyển lớp sinh viên đã có danh sách điểm danh, không tự đánh vắng người chưa được ghi nhận.
+
+Form điểm danh cũ bị từ chối bằng HTTP 409 nếu buổi đã được lưu từ tab/người khác. Cơ chế phiên bản hỗ trợ một container web; chưa hỗ trợ nhiều replica có thư mục tạm riêng. Lịch sử phản ánh trạng thái hiện tại theo thời gian bắt đầu buổi, chưa phải audit trail các lần sửa. Tỷ lệ tham dự = `(Có mặt + Đi muộn) / (Có mặt + Vắng mặt + Đi muộn)`; bỏ qua Chưa điểm danh.
 
 ## Khởi chạy trên Windows
 
-Cần Docker Desktop đang chạy Linux containers và Docker Compose.
+Cần Docker Desktop chạy Linux containers và Docker Compose. Chạy từ thư mục repository. Với stack đã có dữ liệu, giữ nguyên credentials, project và volume.
 
 ```powershell
-cd C:\Users\Admin\OneDrive\Desktop\attendance-system
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-env.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-monitoring.ps1
 docker compose config --quiet
@@ -36,286 +56,128 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-logging.ps1
 docker compose ps
 ```
 
-Nếu `.env` đã có, bỏ qua `setup-env.ps1`; nếu `.env.grafana` và `secrets/` đã có, bỏ qua `setup-monitoring.ps1`. Cả hai script cố ý không ghi đè credentials. Mật khẩu sinh bằng bộ sinh số ngẫu nhiên mật mã, không lưu trong Git. Nginx dùng cổng cố định 18087; phpMyAdmin dùng `PMA_PORT` (mặc định 18086). Biến `WEB_PORT=18085` trong `.env` cũ được giữ nguyên nhưng không còn được Compose sử dụng. Không đổi mật khẩu trong `.env` sau khi đã khởi tạo volume mà chưa đổi mật khẩu tài khoản MySQL tương ứng.
+Bỏ qua script setup tương ứng nếu `.env`, hoặc `.env.grafana` và `secrets/`, đã tồn tại. Các script không ghi đè credentials. Mật khẩu được sinh ngẫu nhiên và giữ ngoài Git. Không đổi mật khẩu trong file env sau khi khởi tạo volume nếu chưa đổi tài khoản MySQL tương ứng. Grafana chỉ đọc mật khẩu admin từ env khi khởi tạo database lần đầu.
 
-- Website qua Nginx: http://127.0.0.1:18087
-- Prometheus: http://127.0.0.1:19090
-- Grafana: http://127.0.0.1:13001 — user/mật khẩu trong `.env.grafana`, không dùng mật khẩu mặc định.
-- phpMyAdmin: http://localhost:18086 — server `db`, tài khoản `attendance_app`, mật khẩu `DB_PASSWORD` trong `.env`. Tài khoản này chỉ có SELECT/INSERT/UPDATE/DELETE; quản trị schema dùng `root` và `DB_ROOT_PASSWORD` khi cần.
-- Project Compose: `attendance-phase1-fresh`; volume: `attendance-phase1-fresh_phase1_data`.
-- MySQL và PHP web không publish cổng ra host. Nginx và phpMyAdmin chỉ bind loopback; cổng 18085 không còn được bộ này sử dụng.
-- Container và volume của các dự án cũ không được tái sử dụng hay xóa. Không dùng `down -v`, `prune` hoặc tên project cũ.
+**Cài mới cần thêm bước xác thực bên dưới:** chuỗi lệnh trên chỉ dựng hạ tầng và schema nghiệp vụ. Compose hiện không tự chạy `database/migrations/001-auth.sql`; website chưa dùng được đăng nhập cho đến khi schema xác thực và Admin đầu tiên sẵn sàng. Không dùng hướng dẫn cài mới để chạy lại migration trên production đã triển khai.
 
-Sau khi sửa PHP/CSS, chạy `docker compose up -d --build web` vì mã được COPY vào image. Dừng riêng bộ này và giữ dữ liệu bằng `docker compose stop`; chạy lại bằng `docker compose start`. SQL khởi tạo chỉ chạy trên volume mới, không tự cập nhật database đã tồn tại.
+| Dịch vụ | Địa chỉ / truy cập |
+|---|---|
+| Website qua Nginx | http://127.0.0.1:18087 |
+| Prometheus | http://127.0.0.1:19090 |
+| Grafana | http://127.0.0.1:13001 — credentials trong `.env.grafana` |
+| phpMyAdmin | http://localhost:18086 — server `db`, user `attendance_app`, mật khẩu lấy cục bộ từ `.env` |
 
-## Thao tác
+Nginx cố định 18087; phpMyAdmin dùng `PMA_PORT` (mặc định 18086). `WEB_PORT=18085` trong env cũ không còn được Compose dùng. MySQL và PHP không publish cổng host; các UI chỉ bind loopback.
 
-1. **Lớp học**: thêm lớp, sửa mã/tên. Chỉ xóa lớp trống, chưa có quan hệ dữ liệu.
-2. **Sinh viên**: thêm mã, họ tên, lớp, email tùy chọn; mở từng dòng để sửa. Ngừng theo dõi/khôi phục giữ nguyên lịch sử. Không chuyển lớp nếu đã có danh sách điểm danh.
-3. **Điểm danh**: tạo buổi với lớp và ngày giờ (UTC+7), mở danh sách, chọn có mặt/vắng mặt/đi muộn rồi lưu. Có thể lưu lại để sửa trạng thái.
-4. **Lịch sử**: lọc theo lớp, sinh viên, khoảng ngày; phân trang 50 dòng.
-5. **Thống kê**: số lượt theo trạng thái, tỷ lệ tham dự từng sinh viên. Tỷ lệ = (có mặt + đi muộn) / tổng lượt đã ghi; bỏ qua trạng thái chưa điểm danh.
+Project: `attendance-phase1-fresh`; volume nghiệp vụ: `attendance-phase1-fresh_phase1_data`. Không tái sử dụng/xóa tài nguyên dự án cũ, không dùng `down -v` hoặc `prune`. Dừng và giữ dữ liệu bằng `docker compose stop`, chạy lại bằng `docker compose start`. SQL init chỉ chạy trên volume mới.
 
-Lớp cần có sinh viên đang học trước khi tạo buổi. Danh sách được chụp tại thời điểm tạo buổi; thêm/khôi phục sinh viên sau đó chỉ ảnh hưởng các buổi mới. Không tự đánh vắng sinh viên chưa được ghi nhận. Database mặc định rỗng, không chứa dữ liệu demo giả làm dữ liệu thật.
+Mã PHP/CSS được COPY vào image: sau khi sửa, cần `docker compose up -d --build web`. Sau khi recreate Nginx/web/db, chạy lại `scripts/start-logging.ps1` để cập nhật mount đúng file log. Không rebuild stack đang triển khai chỉ để cập nhật README.
 
-## Cấu trúc
+## Cài mới: schema xác thực và Admin đầu tiên
+
+Đã đối chiếu [migration](database/migrations/001-auth.sql), [CLI](scripts/create-admin.php), [Dockerfile](Dockerfile) và [Compose](docker-compose.yml):
+
+1. Database đích phải là môi trường cài mới đã xác định đúng project/volume, có schema nghiệp vụ. Dùng tài khoản quản trị schema để áp dụng `database/migrations/001-auth.sql` vào database đó, chẳng hạn qua tab Import của phpMyAdmin. Tài khoản ứng dụng chỉ có DML, không đủ quyền chạy DDL. Migration chỉ tạo ba bảng xác thực, không tự chạy lúc khởi động và không chạy lại được khi bảng đã tồn tại. Với database có dữ liệu, cần backup, kiểm chứng restore và quy trình migration riêng theo [hồ sơ chuẩn bị](docs/auth-stage2a-preparation.md).
+2. Container `web` phải đang chạy mã xác thực, kết nối đúng database bằng các biến `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` của Compose; bảng `users` đã sẵn sàng và chưa có bất kỳ tài khoản role `admin` nào, kể cả tài khoản bị khóa.
+3. Dockerfile chỉ COPY `app/`, không chứa `scripts/create-admin.php`. Web có filesystem read-only, nhưng `/tmp` là tmpfs ghi được cho UID 33. Chép CLI vào đó qua stdin, rồi chạy tương tác từ terminal PowerShell:
+
+```powershell
+Get-Content -Raw -Encoding UTF8 scripts/create-admin.php | docker compose exec -T web sh -c 'cat > /tmp/attendance-create-admin.php'
+if ($LASTEXITCODE -ne 0) { throw 'Khong chep duoc CLI vao web.' }
+try {
+    docker compose exec web php /tmp/attendance-create-admin.php
+    if ($LASTEXITCODE -ne 0) { throw 'Tao Admin chua thanh cong; xem ma loi CLI.' }
+} finally {
+    docker compose exec -T web rm -f /tmp/attendance-create-admin.php
+}
+```
+
+Lệnh tương tác dùng TTY mặc định của `docker compose exec`; **không thêm `-T` vào lệnh chạy PHP**, không pipe mật khẩu. CLI dùng `stty` để tắt echo; cần terminal tương tác có `stream_isatty`, `shell_exec` và `stty` hoạt động. Script nằm ngoài document root, đọc cấu hình PDO từ `/var/www/html/includes/db.php`.
+
+Tên tài khoản gồm 3–64 ký tự `a-z`, số, `.`, `_`, `-`; được chuẩn hóa về chữ thường. Nhập mật khẩu 12–72 byte hai lần trực tiếp tại terminal. CLI dùng `password_hash`, named lock, transaction và xác minh tài khoản trước commit; từ chối nếu đã có Admin. Không có mật khẩu mặc định. Sau thông báo thành công, đăng nhập tại http://127.0.0.1:18087/login.php và thử đăng xuất.
+
+Đây là quy trình suy ra từ mã/cấu hình hiện tại, **chưa chạy lại trọn vẹn trên một cài đặt mới trong lần sửa README này**. Không chạy CLI trên production đã có Admin. Chẩn đoán lỗi xem [hồ sơ CLI cách ly](docs/create-admin-diagnostics.md); tài khoản, container và cổng trong hồ sơ đó là bối cảnh kiểm thử lịch sử.
+
+## Cấu trúc và dữ liệu
 
 | Đường dẫn | Nội dung |
 |---|---|
-| `app/index.php` | Tổng quan và buổi học gần đây |
-| `app/classes.php`, `app/students.php` | Quản lý lớp và sinh viên |
-| `app/attendance.php` | Tạo buổi, ghi và sửa điểm danh |
-| `app/history.php`, `app/statistics.php` | Tra cứu và thống kê |
-| `app/includes/` | PDO, validation, CSRF, layout, escaping, xử lý lỗi |
-| `app/assets/` | Giao diện tiếng Việt responsive, không phụ thuộc CDN |
-| `database/init.sql`, `database/permissions.sql` | Schema và quyền tối thiểu |
-| `Dockerfile`, `docker/php.ini`, `docker-compose.yml` | Môi trường ứng dụng và stack Giai đoạn 1–6 |
-| `scripts/`, `tests/` | Sinh cấu hình và kiểm thử thực tế |
-| `docs/phase1-validation.md` | Kết quả, giới hạn kiểm chứng |
+| `app/index.php` | Tổng quan |
+| `app/classes.php`, `app/students.php` | Lớp và sinh viên |
+| `app/attendance.php`, `app/history.php`, `app/statistics.php` | Điểm danh, lịch sử, thống kê |
+| `app/login.php`, `app/logout.php` | Đăng nhập/đăng xuất |
+| `app/accounts.php`, `app/assignments.php` | Quản trị tài khoản/phân công, chỉ Admin |
+| `app/includes/`, `app/assets/` | PDO, xác thực, CSRF, validation, layout và giao diện nội bộ |
+| `database/init.sql`, `database/permissions.sql`, `database/consistency.sql` | Schema nghiệp vụ, quyền DML, trigger nhất quán lớp |
+| `database/migrations/001-auth.sql`, `scripts/create-admin.php` | Schema xác thực và CLI Admin đầu tiên |
+| `docker-compose.yml`, `Dockerfile`, `docker/`, `nginx/` | Hạ tầng ứng dụng |
+| `prometheus/`, `grafana/`, `loki/`, `promtail/` | Giám sát và log |
+| `scripts/`, `tests/`, `docs/` | Vận hành, kiểm thử và bằng chứng |
 
-## Thiết kế và an toàn
+Bốn bảng nghiệp vụ: `classes → students`, `classes → sessions`, `sessions + students → attendance`. PK kép `(session_id, student_id)` chống ghi trùng; unique `(class_id, starts_at)` chống tạo buổi trùng giờ; mã lớp/mã sinh viên duy nhất. FK InnoDB chặn xóa lớp có dữ liệu; xóa buổi cascade các lượt của buổi đó nhưng giao diện không cung cấp thao tác xóa buổi. Trigger chặn điểm danh khác lớp và chuyển lớp khi đã có danh sách.
 
-`classes → students`, `classes → sessions`, `sessions + students → attendance`. Các bảng có PK và FK InnoDB. PK kép `(session_id, student_id)` chống ghi trùng; unique `(class_id, starts_at)` chống tạo buổi trùng giờ; mã lớp và mã sinh viên là duy nhất. Xóa lớp có dữ liệu bị RESTRICT. Xóa buổi sẽ cascade các lượt của chính buổi đó; giao diện không cung cấp chức năng xóa buổi.
+Ba bảng xác thực đã bổ sung:
 
-PDO sử dụng native prepared statements và bind giá trị, theo [tài liệu PHP](https://www.php.net/manual/en/pdo.prepare.php). Các bộ lọc động chỉ sử dụng tên cột/toán tử từ danh sách cố định. Dữ liệu xuất HTML được escape; POST có CSRF token; kiểm tra ID, mã, độ dài Unicode, email, ngày giờ và trạng thái. Ghi điểm danh và chụp danh sách dùng transaction. Lỗi nội bộ được ghi log, không xuất mật khẩu hay SQL ra giao diện.
-
-Web chạy bằng `www-data`, bỏ capabilities và bật `no-new-privileges`; DB ở network internal, tài khoản ứng dụng không có DDL. Có CSP, chống framing, nosniff và cookie HttpOnly/SameSite. Tên project riêng cô lập tài nguyên theo [tài liệu Compose](https://docs.docker.com/compose/how-tos/project-name/).
-
-## Kiểm thử
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1
-```
-
-Script kiểm tra cấu hình Compose, cú pháp toàn bộ PHP, rồi chạy HTTP thật từ container web và kiểm tra trực tiếp MySQL. Dữ liệu kiểm thử có tiền tố ngẫu nhiên và được dọn bằng ID trong `finally`; không truncate hay xóa dữ liệu có sẵn. Không cung cấp endpoint chạy test trên website. Lệnh trên được giữ để tham chiếu quy trình các giai đoạn đầu. Với kiểm thử có ghi dữ liệu, dùng stack kiểm thử độc lập và hướng dẫn ở Giai đoạn 6; không chạy trên database gốc.
-
-## Giới hạn phạm vi
-
-Ứng dụng hiện phục vụ bài thực hành trên máy cục bộ, **chưa có đăng nhập/phân quyền người dùng và HTTPS**. Đã kiểm tra giao diện bằng Chrome headless ở 390/768/1440px; chưa kiểm tra trên thiết bị vật lý hoặc Safari/Firefox. Bảng dữ liệu cuộn ngang trên màn hình nhỏ. Nginx, Prometheus/Grafana, Loki/Promtail và hardening đã được triển khai lần lượt ở Giai đoạn 2–5. Mô tả cũ “chưa triển khai Loki/Promtail hoặc hardening, file khung logging còn rỗng” chỉ phản ánh thời điểm Giai đoạn 1, không phải trạng thái mã nguồn hiện tại. Các giới hạn về xác thực, HTTPS và kiểm chứng vẫn áp dụng sau khi hoàn thành Giai đoạn 1–6.
-
-Repository Git riêng được tạo trong workspace để lưu mã nguồn Giai đoạn 1. GitHub: https://github.com/dtc245200364-del/attendance-system. Commit đầu tiên: `feat: implement attendance application and MySQL database`. Tại Giai đoạn 1, các commit tiếp theo và báo cáo tối thiểu 10 trang được ghi là công việc tiếp theo. Hiện mã nguồn Giai đoạn 1–6 và Modern Education Dashboard đã có trên `main`; trạng thái hoàn thành báo cáo tối thiểu 10 trang chưa được xác minh trong lần cập nhật này. Chỉ sử dụng minh chứng thật, không tạo ảnh minh chứng giả.
-
-## Nghiệm thu Giai đoạn 1 — 16/10/2026
-
-Kết quả lịch sử khi nghiệm thu Giai đoạn 1: **72 kiểm tra HTTP/MySQL + 29 kiểm tra Chrome + 17 kiểm tra hạ tầng/an toàn = 118 đạt, 0 thất bại**; 8 file ứng dụng PHP qua kiểm tra cú pháp. Chi tiết và giới hạn tại [biên bản nghiệm thu](docs/phase1-acceptance.md). [Ảnh chụp trình duyệt thật](docs/evidence/README.md) dùng dữ liệu có nhãn kiểm thử; không phải dữ liệu điểm danh thực tế.
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/browser-test.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/acceptance-check.ps1
-```
-
-Kiểm thử trình duyệt cần Google Chrome ở đường dẫn mặc định Windows; dùng cổng DevTools loopback 19227, profile riêng trong `tests/.browser-profile-*` đã được ignore. Có thể đổi `-Port`/`-DebugPort` khi cần. Dữ liệu kiểm thử được tạo bằng tiền tố ngẫu nhiên, dọn theo đúng lớp của lượt chạy; không xóa dữ liệu cũ. `acceptance-check.ps1` đăng nhập phpMyAdmin bằng user ứng dụng, đọc mật khẩu trong `.env` vào bộ nhớ và không in ra. Cần quyền truy cập Docker và Git repository riêng của workspace. Các script được cập nhật cho kiến trúc Giai đoạn 2; con số 118 phía trên là kết quả lịch sử tại thời điểm nghiệm thu Giai đoạn 1.
-
-Database đã bổ sung `database/consistency.sql`: trigger chặn thêm/sửa điểm danh khác lớp, chuyển lớp sinh viên có lịch sử và chuyển lớp buổi có danh sách. Cú pháp dựa trên [tài liệu CREATE TRIGGER của MySQL 8.4](https://dev.mysql.com/doc/refman/8.4/en/create-trigger.html). Với volume mới, Compose tự áp dụng sau schema và phân quyền. Với volume Giai đoạn 1 đã tồn tại, áp dụng **một lần** bằng:
-
-```powershell
-docker compose cp database/consistency.sql db:/tmp/attendance-consistency.sql
-docker compose cp scripts/apply-consistency.sh db:/tmp/attendance-consistency.sh
-docker compose exec -T db sh /tmp/attendance-consistency.sh
-```
-
-Script chỉ bổ sung trigger chưa có, không xóa bảng hoặc dữ liệu. Thay đổi nội dung trigger trong tương lai cần migration riêng. Các script `apply-permissions.sh` và `cleanup-test-artifact.*` là công cụ sửa sự cố của lần dựng đầu, không cần chạy trong quy trình khởi động thông thường.
-
-**Git:** tại thời điểm nghiệm thu, Git root còn là `C:/Users/Admin`; các biên bản nghiệm thu lưu lại hiện trạng đó. Khi chuẩn bị Commit 1, đã tạo repository riêng ngay trong `attendance-system`. `.env`, profile trình duyệt, log và file tạm được ignore; `.env.example` chỉ chứa giá trị mẫu. Chỉ stage file dự án trong repository riêng, không chạy `git add` ở repository cha và không force push.
-
-## Giai đoạn 2 — Nginx reverse proxy
-
-```mermaid
-flowchart LR
-    Browser["Trình duyệt · 127.0.0.1:18087"] --> Nginx["Nginx non-root · :8080"]
-    Nginx -->|"proxy network · internal"| PHP["PHP / Apache · :8080 · không publish"]
-    PHP -->|"database network · internal"| MySQL["MySQL · volume giữ nguyên"]
-    PMA["phpMyAdmin · 127.0.0.1:18086"] --> MySQL
-```
-
-Giữ project name `attendance-phase1-fresh` để giữ đúng volume. Mạng proxy riêng `172.30.87.0/29`: Nginx `.2`, web `.3`; không dùng subnet này cho stack khác. Nginx không tham gia mạng database; web không tham gia mạng frontend. Apache chỉ cho phép kết nối từ `.2` và loopback bên trong container (healthcheck/regression). `RemoteIPInternalProxy` chỉ tin `.2`; HTTPS env chỉ được thiết lập từ peer `.2`. Nginx ghi đè Host/X-Forwarded-For/X-Forwarded-Proto, xóa Forwarded; không tin chuỗi proxy do client cung cấp. IP client quan sát được trên Docker Desktop có thể là địa chỉ NAT của host.
-
-Nginx phục vụ HTTP cục bộ, không thiết lập HSTS. Bốn security headers có `always` trên cả CSS và lỗi; ẩn bản sao từ PHP để tránh trùng. CSP chỉ cho tài nguyên cùng origin, tương thích CSS hiện có. Body tối đa 1 MiB, connect timeout 3s, send/read timeout 30s, body timeout 15s, header timeout 10s. Không tự thử lại POST. Lỗi 502/503/504 giữ mã và trả trang tiếng Việt chung; validation 403/409/422 vẫn do ứng dụng xử lý. Read timeout là khoảng chờ giữa các lần đọc, không phải giới hạn tổng thời gian request. Docker DNS được resolve lại để theo IP backend sau rebuild.
-
-Nginx chạy UID 101, root filesystem read-only, ghi file tạm vào tmpfs, bỏ capabilities và bật no-new-privileges. `/healthz` đi qua Nginx → PHP `health.php` → `SELECT 1` ở MySQL, trả 503 nếu DB không sẵn sàng. Web cũng có healthcheck nội bộ. phpMyAdmin giữ đường truy cập cũ và không được proxy trong giai đoạn này.
-
-Áp dụng thay đổi trên stack đang có bằng `docker compose up -d --build --no-deps web nginx`. Compose cần recreate web để thay network/bỏ port; không chạy `down`, không thay/xóa DB hoặc volume. Với cài đặt mới dùng lệnh đầy đủ ở đầu README. Cấu hình Nginx được bind mount: sau khi sửa chạy `docker compose exec nginx nginx -t`, rồi `docker compose exec nginx nginx -s reload`. Khi sửa Compose cần áp dụng lại service liên quan; tránh thao tác với project cũ.
-
-```powershell
-# Toàn bộ nghiệp vụ qua Nginx (mặc định mới)
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1
-# Regression trực tiếp từ bên trong web, không mở cổng host
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1 -BaseUrl http://127.0.0.1:8080
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/proxy-test.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/acceptance-check.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/browser-test.ps1 -Port 18087
-curl.exe -I http://127.0.0.1:18087/
-docker compose ps
-```
-
-`proxy-test.ps1` tạo listener thử lỗi chỉ trong container (18088/18089) và PHP giả lập nội bộ (18090), lấy từ cấu hình Nginx thật, rút ngắn read timeout test xuống 1s. Dừng các tiến trình test trong `finally`; không dừng backend/DB production, không publish cổng test, không tạo endpoint debug trong document root. Script copy test vào tmpfs Nginx qua stdin vì Docker cp không ghi được container read-only. Cần Docker Desktop, không chạy nhiều lượt test đồng thời.
-
-Kết quả Giai đoạn 2: **242 assertions đạt / 0 thất bại ở lượt cuối của từng bộ**, 9/9 file PHP hợp lệ. Xem [biên bản](docs/phase2-validation.md) và [hướng dẫn tự chụp minh chứng](docs/phase2-screenshots.md). Ảnh test qua proxy lưu riêng trong `docs/evidence/phase2/`. Giai đoạn 2 đã commit/push tại `70bdee6`; biên bản lưu hiện trạng tại lúc nghiệm thu.
-
-## Giai đoạn 3 — Prometheus và Grafana
-
-**Đã triển khai; kết quả dưới đây thuộc lần nghiệm thu Giai đoạn 3.** Sau khi người dùng chuyển Docker disk image sang `D:\DockerDesktopData\DockerDesktopWSL`, Docker hoạt động bình thường. Giai đoạn 3 đạt **147/147 kiểm tra cuối**, 4 targets UP/0 DOWN, 9 panel có dữ liệu thật qua Prometheus và Grafana API; CPU/RAM/network có series cho 9 service. Xem [biên bản thực tế](docs/phase3-validation.md). Lỗi thiếu dung lượng trước đó được lưu như lịch sử, không phải trạng thái hiện tại.
-
-```mermaid
-flowchart LR
-    G[Grafana] --> P[Prometheus]
-    P --> C[cAdvisor]
-    P --> NE[Nginx Exporter]
-    P --> ME[MySQL Exporter]
-    NE -->|stub_status nội bộ| N[Nginx]
-    ME -->|USAGE only| M[MySQL]
-    C -->|cgroup và Docker API| D[Docker Desktop Linux VM]
-```
-
-Prometheus scrape mỗi **15s**, timeout **5s**, giữ TSDB tối đa **7 ngày / 1GB** trên volume riêng. Grafana có volume riêng và datasource provisioned `attendance-prometheus`. Dashboard **Attendance System Monitoring** tại http://127.0.0.1:13001/d/attendance-system được provision từ JSON trong `grafana/dashboards/`, không chứa số liệu giả: CPU, RAM working set, network RX/TX theo service, Nginx requests/s, MySQL current/total connections, Nginx active connections và scrape target health. `up` phản ánh scrape endpoint, không thay thế giám sát nghiệp vụ end-to-end. CPU biểu diễn phần trăm một CPU, có thể vượt 100% khi dùng nhiều core.
-
-Mạng `monitoring` là internal. Chỉ Prometheus/Grafana có thêm mạng UI và cổng loopback 19090/13001; exporter không publish host. Nginx Exporter có IP `.4` trên mạng proxy, là peer duy nhất được đọc listener `9091/stub_status`. MySQL Exporter nối monitoring + database, dùng credentials file mount read-only. Nginx không được nối mạng database; Prometheus/Grafana không nối database.
-
-`attendance_monitor` chỉ có **USAGE**, tối đa 3 kết nối; chỉ bật global status/variables, tắt collector cần đọc bảng, replication hoặc quyền PROCESS. Không cấp SELECT trên dữ liệu sinh viên, không dùng root hay user ứng dụng cho exporter. File `secrets/monitoring-user.sql` được sinh cục bộ; `CREATE USER IF NOT EXISTS` không đổi mật khẩu của tài khoản đã tồn tại. Nếu credentials mất/không khớp, cần xử lý có chủ đích, không xóa volume hoặc chạy lại sinh mật khẩu một cách tùy tiện.
-
-**cAdvisor tại Giai đoạn 3 (lịch sử; mount hiện tại xem Giai đoạn 5):** chạy root để đọc cgroup của Linux VM, `cgroup: host`, đọc `/`, `/sys`, `/var/lib/docker` và Docker socket; không `privileged`, không thêm capabilities. Docker Desktop hiện cần `--containerd=/rootfs/run/containerd/containerd.sock` để đăng ký Docker factory; socket này nằm trong mount đã có. Tắt collector `disk` vì không cần cho CPU/RAM/network và tránh phải cấp quyền đọc thư mục riêng; không thu OOM events do không cấp `/dev/kmsg`. Docker/containerd socket mount `:ro` vẫn cho phép API thực hiện thao tác ghi nếu tiến trình bị chiếm quyền; đây là quyền nhạy cảm, không tương đương API read-only. Không public cAdvisor; Prometheus chỉ lưu metrics có label project này. cAdvisor vẫn có khả năng quan sát metadata container khác trong Docker VM; không thao tác dừng/sửa chúng. Không dùng stack này như một mô hình tenant isolation mạnh.
-
-Trên stack đã có (không khởi động lại DB): chạy setup monitoring **một lần**, sau đó `scripts/start-monitoring.ps1`. Script cấp tài khoản bằng root bên trong DB, không in mật khẩu, chỉ cập nhật Nginx và service giám sát. Cài mới làm theo thứ tự ở đầu README. Không commit `.env.grafana`, `secrets/`, log hay profile trình duyệt. Grafana chỉ đọc mật khẩu admin lúc khởi tạo database Grafana lần đầu; đổi file env không tự đổi mật khẩu tài khoản đã tồn tại.
-
-```powershell
-docker compose config --quiet
-docker compose exec prometheus promtool check config /etc/prometheus/prometheus.yml
-docker compose ps
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/monitoring-test.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/monitoring-access-test.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/acceptance-check.ps1
-```
-
-Không chạy test đồng thời. Bộ monitoring-test gửi 40 request thật, chờ hai scrape, kiểm tra target UP, nginx_up/mysql_up, tăng counter và cả PromQL lẫn truy vấn qua Grafana cho từng panel. Xem [kết quả thực tế](docs/phase3-validation.md) và [hướng dẫn chụp ảnh](docs/phase3-screenshots.md). Các template datasource/dashboard dựa trên [Grafana provisioning](https://grafana.com/docs/grafana/latest/administration/provisioning/); exporters theo [NGINX Exporter](https://github.com/nginx/nginx-prometheus-exporter), [MySQL Exporter](https://github.com/prometheus/mysqld_exporter), [cAdvisor](https://github.com/google/cadvisor/blob/master/docs/running.md).
-
-Giai đoạn 3 đã commit/push tại `344f50c`. Chưa triển khai alert rules/Alertmanager. Các UI dùng HTTP loopback; Prometheus không có đăng nhập.
-
-## Giai đoạn 4 — Loki và Promtail
-
-Loki `3.7.8` lưu log trên volume `loki_data`, dùng TSDB v13, compactor retention **168 giờ**, index 24 giờ. Promtail `3.5.12` thu log thật của Nginx, PHP và mã sự kiện máy chủ MySQL; lưu offset trên volume `promtail_positions`. Hai service chỉ thuộc mạng `monitoring` nội bộ, **không publish cổng host**, có giới hạn CPU/RAM. Grafana giữ datasource Prometheus mặc định và dashboard 9 panel; thêm datasource `attendance-loki` và dashboard [Attendance System Logs](http://127.0.0.1:13001/d/attendance-logs).
-
-**Promtail đã EOL từ 02/03/2026**, không còn được bảo trì. Người dùng đã xác nhận bắt buộc dùng cho đề thi cục bộ. Với triển khai lâu dài, chuyển sang [Grafana Alloy](https://grafana.com/docs/alloy/latest/set-up/migrate/from-promtail/). Không dùng cấu hình này như một hệ thống production được hỗ trợ.
-
-```mermaid
-flowchart LR
-    N[Nginx JSON access log] --> T[Promtail: lọc trường cho phép]
-    P[PHP structured application log] --> T
-    M[MySQL server log: chỉ level và mã MY] --> T
-    T --> L[Loki: volume riêng, retention 7 ngày]
-    G[Grafana: 127.0.0.1:13001] --> L
-    G --> PR[Prometheus giữ nguyên]
-```
-
-Áp dụng trên stack hiện có, từ đúng thư mục dự án (không chạy `down`):
-
-```powershell
-docker compose config --quiet
-docker compose up -d --build --no-deps web
-docker compose exec nginx nginx -t
-# Chỉ reload sau khi nginx -t thành công:
-docker compose exec nginx nginx -s reload
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-logging.ps1
-# Nhận datasource mới, giữ nguyên database Grafana trên volume:
-docker compose restart grafana
-```
-
-Script start yêu cầu Nginx/PHP/MySQL đang chạy, xác minh project/service/log driver rồi sinh `docker-compose.override.yml` cục bộ, được Git và Docker build bỏ qua. File này chỉ mount **đúng ba file JSON log** read-only, không mount thư mục metadata container, Docker socket hoặc log dự án khác. Compose tự đọc override. **Chạy lại script sau khi recreate Nginx/web/db**; nếu Docker xoay file log, restart Promtail để gắn lại file hiện tại, rồi kiểm tra log mới tới Loki. Không tạo file override khác cùng tên. Với stack cài mới, hoàn thành bước khởi tạo ứng dụng và monitoring bên trên trước, rồi mới chạy script logging.
-
-Promtail dùng UID 0 để đọc file Docker thuộc root; bỏ toàn bộ capabilities, root filesystem read-only, chỉ ghi positions trên volume riêng. Loki dùng UID 10001. Không cấp privileged hoặc mount socket cho hai dịch vụ mới. Tại Giai đoạn 4, cAdvisor còn giữ quyền của Giai đoạn 3; cấu hình mount sau hardening được mô tả ở Giai đoạn 5.
-
-Nginx ghi method giới hạn, route từ allowlist, status, level và request ID do edge tạo; không ghi IP/query/cookie/body vào access log mới. PHP ghi sự kiện `request_completed` và exception chung, không ghi message/stack trace/SQL. Promtail bỏ mọi dòng không khớp định dạng được duyệt; log MySQL chỉ giữ severity và mã `MY-xxxxxx`, không giữ câu SQL hay nội dung thông báo. Các nhãn là `job`, `service`, `container`, `log_type`, `level`, `status` nếu có; request ID chỉ ở nội dung để tránh cardinality cao. Raw log Docker của Apache/Nginx error có thể vẫn chứa dữ liệu request, **không chuyển những dòng đó vào Loki**, không đưa raw log lên GitHub.
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/logging-test.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/monitoring-test.ps1 -ResultPath docs/phase4-monitoring-results.json
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/monitoring-access-test.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/acceptance-check.ps1
-# Trước/sau regression có thể lưu fingerprint bằng scripts/data-fingerprint.ps1.
-# Chỉ chạy final check sau khi đã có hai file fingerprint và kết quả logging:
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/logging-final-check.ps1
-```
-
-Trong Grafana → Explore → datasource **Loki**, dùng:
-
-```logql
-{job="attendance",service="nginx"}
-{job="attendance",service="nginx"} | json | status = 404
-sum by (service) (count_over_time({job="attendance"}[5m]))
-```
-
-Tạo 404 mới tại http://127.0.0.1:18087/phase4-log-proof; chọn Last 15 minutes và Refresh. Log MySQL chủ yếu phát sinh lúc khởi động: tăng khoảng thời gian nếu chưa thấy, không restart DB để tạo log. Xem [biên bản nghiệm thu](docs/phase4-validation.md) và [hướng dẫn tự chụp minh chứng thật](docs/phase4-screenshots.md). Giai đoạn 4 đã commit/push tại `76be11e`.
-
-## Giai đoạn 5 — Hardening
-
-Giai đoạn 5 giữ nguyên nghiệp vụ, giao diện tại thời điểm triển khai và bốn cổng loopback; giao diện được cập nhật sau đó trong Modern Education Dashboard. PHP vẫn UID/GID 33; MySQL daemon hiện UID/GID 999 theo image, không ép user/khởi động lại DB. Chín service ứng dụng/observability có root filesystem read-only, `cap_drop: ALL`, `no-new-privileges`, giới hạn CPU/RAM/PID. Các volume ghi dữ liệu Prometheus/Grafana/Loki/positions giữ nguyên; PHP chỉ ghi tmpfs `/tmp`, `/var/run/apache2`, `/var/lock/apache2` với UID 33, noexec/nosuid và giới hạn dung lượng. Session PHP trong tmpfs mất khi recreate container; đây không phải dữ liệu MySQL.
-
-| Nhóm đã kiểm chứng | Cấu hình và phép thử thực tế |
+| Bảng | Vai trò |
 |---|---|
-| Non-root/quyền container | Docker top UID/GID, `/proc/1/status` PHP CapEff=0 và NoNewPrivs=1; mở mã nguồn để ghi bị từ chối, ghi tạm thành công |
-| Network isolation | Proxy/database/monitoring internal; chỉ Nginx publish website; không publish backend/DB; TCP Nginx → IP DB:3306 bị chặn |
-| Secrets/quyền DB | Bốn mật khẩu khác nhau sinh ngẫu nhiên 256-bit, ignored; app chỉ DML trong schema, monitor USAGE và tối đa 3 connection, SELECT dữ liệu sinh viên bị từ chối |
-| HTTP headers/session | CSP, DENY, nosniff, same-origin trên HTML/CSS/404; ẩn phiên bản/PHP banner; cookie HttpOnly và SameSite Strict |
-| Filesystem/tài nguyên/mount | Chín service read-only và CPU/RAM/PID limits; cAdvisor bỏ mount toàn VM và Docker data, Promtail chỉ đọc ba file log |
+| `users` | Tên đăng nhập duy nhất, password hash, role `admin`/`lecturer`, trạng thái active, `auth_version`, thời điểm tạo |
+| `class_lecturers` | Phân công lớp–tài khoản; PK `(class_id, user_id)`, FK tới `classes`/`users`, trạng thái active để thu hồi phân công |
+| `auth_limits` | Bucket giới hạn đăng nhập, số lần thử và thời điểm đầu cửa sổ; không lưu mật khẩu hoặc IP thô |
 
-cAdvisor giờ chỉ mount `/proc:/rootfs/proc:ro`, `/sys:/sys:ro` và đúng hai Docker/containerd sockets `:ro`, không mount `/:/rootfs` hoặc `/var/lib/docker`. CPU/RAM/network phải được kiểm tra lại sau thay đổi này. **Socket `:ro` không hạn chế quyền API**; cAdvisor vẫn là thành phần nhạy cảm chạy root, cần mạng nội bộ và trusted operator. Promtail root cần đọc file root-owned, không có runtime socket. Không mở rộng privileged/capabilities. Không đổi MySQL/phpMyAdmin chỉ để đạt số lượng biện pháp.
+Database cài mới không có dữ liệu demo hay tài khoản mặc định. Không đưa mật khẩu, token, bản sao database hoặc dữ liệu cá nhân vào Git.
 
-Áp dụng trên stack đang chạy sẽ recreate riêng các service dưới đây, gián đoạn ngắn website/monitoring; không recreate DB/phpMyAdmin. Không cần build lại PHP vì chỉ đổi Compose và test scripts:
+## Kiến trúc, giám sát và hardening
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/data-fingerprint.ps1 -OutputPath docs/phase5-data-before.json
-docker compose config --quiet
-docker compose up -d --no-deps web nginx prometheus grafana cadvisor nginx-exporter mysql-exporter loki
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-logging.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/monitoring-test.ps1 -ResultPath docs/phase5-monitoring-results.json
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/logging-test.ps1 -ResultPath docs/phase5-logging-results.json
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/monitoring-access-test.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/acceptance-check.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/data-fingerprint.ps1 -OutputPath docs/phase5-data-after.json
-# Audit theo phiên làm việc cần inventory/hash baseline cục bộ trong secrets/:
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/hardening-test.ps1
+```mermaid
+flowchart LR
+    B[Trình duyệt loopback] --> N[Nginx :8080]
+    N --> W[PHP / Apache :8080]
+    W --> D[MySQL]
+    PMA[phpMyAdmin loopback] --> D
+    G[Grafana loopback] --> P[Prometheus]
+    P --> E[cAdvisor / Nginx Exporter / MySQL Exporter]
+    T[Promtail: log Nginx / PHP / MySQL] --> L[Loki]
+    G --> L
 ```
 
-`copy-web-test.ps1` truyền file test bằng Base64 ASCII vào tmpfs dưới UID 33 và kiểm SHA256 nguyên byte, vì Docker cp không dùng được với container read-only. Không tạo debug endpoint. `hardening-test.ps1` dùng inventory `secrets/phase5-runtime-before.json` và hash `secrets/phase5-secret-hashes.json` đã lưu cục bộ trước audit; các baseline này không vào Git. Nếu chuyển máy, dùng lệnh kiểm tra/quy trình trong [biên bản](docs/phase5-validation.md), không sao chép secrets từ máy cũ.
+- **Nginx:** mạng proxy internal `172.30.87.0/29`, Nginx `.2`, web `.3`, exporter `.4`. Không dùng subnet này cho stack khác. Apache chỉ tin proxy `.2`; Nginx ghi đè forwarding headers, không tin chuỗi client gửi. Nginx không nối database; web không nối frontend. `/healthz` kiểm tra qua PHP tới `SELECT 1` MySQL. CSP, chống framing, nosniff, same-origin áp dụng cả lỗi; body tối đa 1 MiB, không tự retry POST. HTTP cục bộ chưa có HTTPS/HSTS.
+- **Prometheus/Grafana:** scrape 15 giây, timeout 5 giây, retention tối đa 7 ngày/1 GB. Dashboard [Attendance System Monitoring](http://127.0.0.1:13001/d/attendance-system) có 9 panel CPU/RAM/network, Nginx, MySQL và target health. `up` chỉ phản ánh scrape endpoint; CPU có thể vượt 100% khi dùng nhiều core. Exporters không publish host; tài khoản MySQL monitor chỉ USAGE, tối đa 3 kết nối, không đọc dữ liệu sinh viên. Chưa có alert rules/Alertmanager.
+- **Loki/Promtail:** Loki `3.7.8`, TSDB v13, index 24 giờ, retention 168 giờ; Promtail `3.5.12` lưu positions trên volume riêng. Chỉ mạng monitoring internal, không publish host. Dashboard [Attendance System Logs](http://127.0.0.1:13001/d/attendance-logs). Promtail chỉ mount ba file log đúng container, không mount Docker socket/metadata hoặc log dự án khác. Sau Docker log rotation cần restart Promtail và xác minh log mới tới Loki.
+- **Lọc log:** Nginx chỉ ghi trường cho phép, không IP/query/cookie/body; PHP không ghi exception message/stack/SQL; MySQL chỉ giữ severity và mã `MY-xxxxxx` khi chuyển vào Loki. Không đưa raw Docker log lên GitHub. Có thể tra `{job="attendance",service="nginx"}` trong Grafana Explore/Loki.
+- **Container:** chín service ứng dụng/observability được hardening read-only, `cap_drop: ALL`, `no-new-privileges`, giới hạn CPU/RAM/PID. PHP UID/GID 33, ghi vào tmpfs giới hạn; session mất khi recreate web. MySQL daemon UID/GID 999 theo image. Các volume dữ liệu giữ riêng.
+- **Quyền nhạy cảm:** cAdvisor chạy root, chỉ mount `/proc`, `/sys` và hai Docker/containerd sockets; socket `:ro` vẫn cho phép API ghi nếu tiến trình bị chiếm quyền. Promtail chạy root để đọc file log nhưng không có runtime socket. Không dùng mô hình này làm tenant isolation mạnh.
+- **Ứng dụng:** PDO native prepared statements, escape HTML, validation server, CSRF, transaction khi chụp danh sách/ghi điểm danh, kiểm tra quyền theo lớp. Session đổi ID khi login, cookie HttpOnly/SameSite Strict; Secure khi có HTTPS qua proxy tin cậy. Giới hạn đăng nhập 10 lần/15 phút theo tài khoản và IP qua proxy, gồm cả lần thành công.
 
-Ứng dụng hiện **chưa có đăng nhập/phân quyền người dùng**; CSRF không thay thế xác thực. Chỉ dùng demo trên máy tin cậy với loopback, không public/tunnel hoặc dữ liệu sinh viên thật. Đề xuất giai đoạn riêng thêm login, role giảng viên/quản trị và authorization từng thao tác; chưa tự thay đổi ứng dụng trong giai đoạn này. Promtail EOL, quyền sockets và giới hạn retention vẫn như biên bản Giai đoạn 4.
+Promtail đã EOL từ 02/03/2026; được giữ theo yêu cầu bài thực hành. Triển khai lâu dài cần chuyển sang Grafana Alloy. Hệ thống hiện dành cho máy cục bộ tin cậy; chưa có HTTPS, Prometheus không có đăng nhập, chưa có audit trail nghiệp vụ đầy đủ.
 
-Xem [nghiệm thu hardening](docs/phase5-validation.md) và [hướng dẫn tự chụp ảnh thật](docs/phase5-screenshots.md). Giai đoạn 5 đã commit/push tại `d84251a`.
+## Kiểm thử và hồ sơ nghiệm thu
 
-## Giai đoạn 6 — Điểm danh, lịch sử và thống kê
-
-Đã kiểm thử **243 PASS, 0 FAIL; 10/10 PHP lint**: 72 HTTP/MySQL, 39 logic Giai đoạn 6/Nginx, 29 Chrome, 54 Prometheus/Grafana và 49 Loki/Promtail. Đây là kết quả lượt kiểm thử ngày 17/10/2026; không phải phép thử mới ở mỗi lần clone. [Báo cáo, bằng chứng và giới hạn](docs/phase6-validation.md).
-
-Form cũ bị từ chối bằng HTTP 409 sau khi buổi được lưu từ tab/người khác. Phiên bản dùng chung giữa PHP worker trong **một container web**, kết hợp ảnh chụp dữ liệu và kiểm tra trong transaction; không hỗ trợ nhiều replica web với thư mục tạm riêng. Hiển thị ID buổi trên điểm danh/lịch sử; tạo buổi cùng lớp/ngày có tiêu đề tương tự cần đối chiếu và xác nhận. Không tự gộp/xóa buổi, không migration database.
-
-Lịch sử hiển thị trạng thái hiện tại theo buổi và thời gian bắt đầu buổi, không phải nhật ký các lần sửa. Tỷ lệ giữ nguyên `(Có mặt + Đi muộn) / (Có mặt + Vắng mặt + Đi muộn)`; chưa điểm danh không nằm trong mẫu số. Lớp đông gửi JSON để tránh `max_input_vars`; payload thiếu/sai bị từ chối toàn bộ. Đã kiểm thử HTTP với 1.101 sinh viên; chưa kiểm thử render danh sách đó trên thiết bị vật lý. Chưa có đăng nhập/phân quyền và audit trail.
-
-**Chỉ chạy kiểm thử ghi trên stack riêng dưới đây**, thay cho lệnh test mặc định của các giai đoạn trước nếu cần bảo toàn dữ liệu gốc. Stack test dùng project `attendance-phase6-test`, cổng loopback 18097, subnet 172.30.96.0/29 và volume riêng. Nếu cổng/subnet đang dùng, dừng để điều chỉnh cấu hình test; không thay đổi tài nguyên của dự án khác.
-
-Tạo `.env.phase6` một lần cho **volume test mới**, không ghi đè file đã có, không dùng mật khẩu gốc. Lệnh này không in mật khẩu:
+Với mã xác thực hiện tại, dùng runner **database RAM riêng**; cần nhánh `feature/dang-nhap-phan-quyen`, Docker Desktop và cổng loopback 18099 còn trống. Lượt Chrome cần Chrome ở đường dẫn mặc định Windows. Mỗi lượt tạo project/database mới, dừng đúng project đó; không ghi fixture vào 18087 hoặc stack dùng chung 18098.
 
 ```powershell
-if (!(Test-Path -LiteralPath .env.phase6)) {
-    $phase6AppSecret = [Guid]::NewGuid().ToString('N') + [Guid]::NewGuid().ToString('N')
-    $phase6RootSecret = [Guid]::NewGuid().ToString('N') + [Guid]::NewGuid().ToString('N')
-    [IO.File]::WriteAllText((Join-Path (Get-Location) '.env.phase6'), "PHASE6_DB_PASSWORD=$phase6AppSecret`nPHASE6_ROOT_PASSWORD=$phase6RootSecret`n")
-    Remove-Variable phase6AppSecret,phase6RootSecret
-}
-docker compose --env-file .env.phase6 -f docker-compose.phase6.yml up -d --build
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/phase6-test.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/browser-test.ps1 -Port 18097 -DebugPort 19237 -ComposeFile docker-compose.phase6.yml -ComposeEnvFile .env.phase6 -EvidenceDirectory docs/evidence/phase6
-docker compose --env-file .env.phase6 -f docker-compose.phase6.yml stop
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-auth-disposable.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-auth-disposable.ps1 -Browser
 ```
 
-Giữ nguyên `.env.phase6` khi dùng lại volume test; không reset/xóa volume để đổi mật khẩu. Chrome cần cài tại đường dẫn mặc định như hướng dẫn kiểm thử trước đó. Kiểm thử giám sát/log trên stack gốc dùng các lệnh trong báo cáo Giai đoạn 6 và chỉ tạo traffic, log thử an toàn; không ghi điểm danh. Các hash trước/sau xác nhận cả bốn bảng dữ liệu gốc không đổi.
+Không chạy đồng thời các bộ test. Không chạy các script HTTP/MySQL ghi dữ liệu cũ bằng Compose production. Hướng dẫn test Giai đoạn 1–6 trong các biên bản chỉ phản ánh kiến trúc tại thời điểm nghiệm thu; không mặc định tương thích luồng đăng nhập mới.
 
-Có [9 ảnh Chrome thật](docs/evidence/phase6/README.md) dùng fixture được gắn nhãn kiểm thử. Chưa có ảnh riêng của HTTP 409, cảnh báo buổi tương tự hoặc thao tác lưu 1.101 sinh viên; các tình huống này có kết quả kiểm thử tự động. Không tạo ảnh AI hay ảnh minh chứng giả. Thư mục ảnh cục bộ Giai đoạn 4–5 `docs/screenshots/` được giữ ngoài Commit 6.
+| Hồ sơ | Kết quả lịch sử / nội dung |
+|---|---|
+| [Giai đoạn 1](docs/phase1-acceptance.md) | 118 đạt, 0 thất bại; [kiểm chứng và giới hạn](docs/phase1-validation.md) |
+| [Giai đoạn 2](docs/phase2-validation.md) | 242 assertions đạt, 0 thất bại ở lượt cuối từng bộ |
+| [Giai đoạn 3](docs/phase3-validation.md) | 147/147; 4 targets UP, 9 panel có dữ liệu thật |
+| [Giai đoạn 4](docs/phase4-validation.md) | Pipeline log, lọc trường, retention, bảo toàn dữ liệu |
+| [Giai đoạn 5](docs/phase5-validation.md) | Hardening, quyền DB, mạng, filesystem, hash dữ liệu |
+| [Giai đoạn 6](docs/phase6-validation.md) | 243 PASS, 0 FAIL; 10/10 PHP lint ngày 17/10/2026 |
+| [Modern Education Dashboard](docs/modern-ui-validation.md) | 455 PASS, 0 FAIL; 10/10 PHP lint; trạng thái staging trong hồ sơ là trước merge PR #1 |
+| [Xác thực giai đoạn 1 — 23/10/2026](docs/auth-stage1-validation.md) | Cách ly: auth 101/101; hồi quy 72/72, sinh viên 39/39, Giai đoạn 6 39/39, Chrome 17/17 |
+| [Xác thực 2A](docs/auth-stage2a-preparation.md) | Backup, restore/migration trên bản sao trước triển khai |
+| [Xác thực production 2B — 23/10/2026](docs/auth-stage2b-live.md) | Đã migration, đăng nhập/đăng xuất Admin, mở lại website, hash nghiệp vụ không đổi |
 
-## Modern Education Dashboard — đã commit và merge vào main
+Các câu “chưa đăng nhập”, “chưa migration/triển khai production” trong hồ sơ Giai đoạn 1–6 hoặc xác thực 1/2A là **trạng thái lịch sử trước production 2B ngày 23/10/2026**. [Thiết kế xác thực ban đầu](docs/auth-implementation.md) và [rà soát test](docs/auth-test-review.md) cung cấp bối cảnh kỹ thuật, không thay thế biên bản triển khai mới nhất.
 
-Giao diện sáu trang được thiết kế lại trên nhánh `feature/modern-attendance-ui`, từ Commit 6. Layout dùng sidebar xanh đậm, icon SVG nội bộ, KPI/bảng/form thống nhất, tìm kiếm sinh viên phía trình duyệt và biểu đồ từ dữ liệu thật. Phạm vi cuối cùng bao gồm form Sửa, Ngừng theo dõi/Khôi phục và Xóa an toàn: sinh viên có bất kỳ lượt điểm danh nào, kể cả Chưa điểm danh, không được xóa; dùng Ngừng theo dõi để giữ lịch sử. Không đổi schema, CSRF, transaction, version, HTTP 409 hoặc công thức chuyên cần.
+Ảnh minh chứng: [Giai đoạn 1](docs/evidence/README.md), [Giai đoạn 2](docs/evidence/phase2/README.md), [Giai đoạn 6](docs/evidence/phase6/README.md), [Modern UI](docs/screenshots/modern-ui/README.md). Hướng dẫn tự chụp: [Giai đoạn 2](docs/phase2-screenshots.md), [3](docs/phase3-screenshots.md), [4](docs/phase4-screenshots.md), [5](docs/phase5-screenshots.md). Chỉ dùng ảnh thật và dữ liệu đã được phép công khai; không tạo minh chứng giả.
 
-Bản UI đã triển khai tại http://127.0.0.1:18087, gồm chiều rộng trang Sinh viên đã duyệt; **đã commit tại `fec2dcc` và merge vào `main` qua Pull Request #1 (`fbf4915`)**. Địa chỉ triển khai này được ghi nhận trong tài liệu bàn giao, chưa kiểm tra lại runtime ở lần cập nhật README. Lượt nghiệm thu lịch sử đạt **455 PASS, 0 FAIL; PHP lint 10/10** trên database kiểm thử độc lập cho các thao tác ghi. [Tài liệu bàn giao](docs/modern-ui-validation.md) mô tả phạm vi, công thức thống kê, bảo toàn MySQL/monitoring và cách tái hiện; các câu “đã stage, chưa commit/push/merge” trong tài liệu đó là trạng thái lịch sử trước khi merge PR #1. [6 ảnh Chrome do người dùng chụp](docs/screenshots/modern-ui/README.md) đã được kiểm tra; người dùng xác nhận dữ liệu hiển thị là giả lập và được phép công khai. Toàn bộ ảnh kiểm thử tự động giữ ngoài commit. Theo biên bản nghiệm thu, cả bốn bảng dữ liệu gốc giữ nguyên hash trước/sau. [Danh sách file đề xuất](docs/modern-ui-commit-files.txt) lưu phạm vi chuẩn bị commit UI tại thời điểm đó; ảnh thật chứa dữ liệu gốc và các bản ghi triển khai cục bộ được giữ ngoài danh sách. Đây là hồ sơ lịch sử, không phải yêu cầu staging hiện tại.
+Giao diện từng được kiểm tra Chrome headless ở 390/768/1440px; chưa xác nhận thiết bị vật lý, Safari/Firefox. Luồng 1.101 sinh viên có kiểm thử HTTP, chưa kiểm thử render trên thiết bị vật lý. Trạng thái hoàn thành báo cáo tối thiểu 10 trang của Đề 27 chưa được xác minh.
+
+Repository: [attendance-system trên GitHub](https://github.com/dtc245200364-del/attendance-system). Credentials, secrets, profile trình duyệt và file tạm phải giữ ngoài Git. Chỉ thao tác Git trong repository dự án, không stage ở repository cha hoặc force push.
